@@ -78,3 +78,52 @@ authController.confirmEmail = async function (req, res) {
 };
 
 module.exports = authController;
+
+const jwt = require('jsonwebtoken');
+
+// [RF2] - Login de utilizadores
+authController.login = async function (req, res) {
+    try {
+        const { email, password } = req.body;
+
+        // 1. Procurar o utilizador na Base de Dados
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: "Credenciais inválidas." });
+        }
+
+        // 2. Verificar o Status (Bloquear se estiver PENDING)
+        if (user.status === 'PENDING') {
+            return res.status(403).json({ 
+                message: "A sua conta ainda não foi ativada. Verifique o seu email." 
+            });
+        }
+
+        // 3. Comparar a password enviada com a password encriptada (bcrypt)
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Credenciais inválidas." });
+        }
+
+        // 4. Gerar o Token JWT (Dá autorização para navegar no site)
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            'chave_secreta_pds_2026', // Idealmente isto estaria no ficheiro .env
+            { expiresIn: '1d' } // O login dura 24 horas
+        );
+
+        // 5. Enviar resposta de sucesso
+        res.status(200).json({
+            message: "Login realizado com sucesso!",
+            token: token,
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Erro no servidor ao tentar fazer login", error });
+    }
+};
