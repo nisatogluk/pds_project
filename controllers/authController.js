@@ -1,79 +1,73 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 
-var authController = {};
+const authController = {};
 
-// [RF1] - Registo: Transição para estado PENDING
 authController.register = async function (req, res) {
-  try {
-    const hashedPassword = bcrypt.hashSync(req.body.password, 8);
+    try {
+        const { name, email, password } = req.body;
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "Email já registado." });
+        }
 
-    // Criar o utilizador - o status 'PENDING' é atribuído por defeito pelo Model
-    const userCreated = await User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: hashedPassword,
-      role: "Contributor"
-      // status: 'PENDING' (já definido no models/user.js)
-    });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({
+            name,
+            email,
+            password: hashedPassword,
+            status: 'PENDING',
+            role: 'Contributor'
+        });
 
-    // Configurar o envio de email (Ethereal)
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      auth: {
-        user: 'michelle.schoen@ethereal.email', 
-        pass: 'dEBrgUwZ5VrrBEFkXZ'               
-      }
-    });
-
-    const urlConfirmacao = `http://localhost:3000/api/v1/auth/confirm/${userCreated.email}`;
-    
-    // Enviar o email de confirmação
-    await transporter.sendMail({
-      from: '"Sistema PDS" <noreply@pds.com>',
-      to: userCreated.email,
-      subject: "Confirmação de Registo - PDS",
-      html: `<h1>Olá ${userCreated.name}!</h1>
-             <p>A tua conta está atualmente como <strong>PENDING</strong>.</p>
-             <p>Clica no link abaixo para passares a <strong>ACTIVE</strong>:</p>
-             <a href="${urlConfirmacao}">ATIVAR MINHA CONTA</a>`
-    });
-
-    res.status(201).send({ 
-      msg: "Utilizador registado com sucesso!", 
-      status: userCreated.status 
-    });
-
-  } catch (exception) {
-    console.log("ERRO NO REGISTO:", exception);
-    res.status(500).send("Erro ao processar o registo. O email pode já existir.");
-  }
+        await newUser.save();
+        res.status(201).json({ message: "Utilizador registado." });
+    } catch (error) {
+        res.status(500).json({ error });
+    }
 };
 
-// [Confirmação] - Transição PENDING -> ACTIVE
 authController.confirmEmail = async function (req, res) {
     try {
-      // Atualiza o estado conforme o Diagrama de Estados
-      const updatedUser = await User.findOneAndUpdate(
-        { email: req.params.email }, 
-        { status: 'ACTIVE' },
-        { new: true } // Para retornar o utilizador já atualizado
-      );
+        const { email } = req.query;
+        await User.findOneAndUpdate({ email }, { status: 'ACTIVE' });
+        res.send("Conta ativada.");
+    } catch (error) {
+        res.status(500).send("Erro.");
+    }
+};
 
-      if (!updatedUser) {
-        return res.status(404).send("Utilizador não encontrado.");
-      }
+authController.login = async function (req, res) {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(401).json({ message: "Credenciais inválidas." });
+        }
 
-      res.status(200).send(`
-        <h1>Sucesso!</h1>
-        <p>A conta de ${updatedUser.email} foi ativada.</p>
-        <p>Estado atual: <strong>${updatedUser.status}</strong></p>
-      `);
-    } catch (err) {
-      console.log("ERRO NA ATIVAÇÃO:", err);
-      res.status(500).send("Erro técnico ao ativar a conta.");
+        if (user.status === 'PENDING') {
+            return res.status(403).json({ message: "Conta não ativada." });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Credenciais inválidas." });
+        }
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            'chave_secreta_pds_2026',
+            { expiresIn: '1d' }
+        );
+
+        res.status(200).json({
+            token,
+            user: { name: user.name, role: user.role }
+        });
+    } catch (error) {
+        res.status(500).json({ error });
     }
 };
 
