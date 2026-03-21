@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.m
   .then(() => console.log('✅ Connected to DB!'))
   .catch((e) => console.log('❌ Error connecting to DB!'));
 
-const app = express();
+const app = express(); 
 
 app.use(logger('dev'));
 app.use(express.json());
