@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
-var Item = require('../models/item');
-
+//var Item = require('../models/item');
+var Occurrence = require('../models/occurrence');//new occurence file
 var itemRESTController = {};
 
 // mostra todos items 
-itemRESTController.showAll = async function(req, res,next){
+/*itemRESTController.showAll = async function(req, res,next){
     try {
         const dbitems = await Item.find({})
         console.log(dbitems);
@@ -63,5 +63,45 @@ itemRESTController.delete = async function(req, res,next){
         next(err);
     }
 }
+*/
 
+// [US#20] Create Occurrence
+itemRESTController.createOccurrence = async function(req, res, next){
+    try {
+        const { title, description, category, location, photoUrl, userId } = req.body; 
+
+        if (!description || !category || !location || !photoUrl) {
+            return res.status(400).json({ 
+                message: 'All required fields must be filled.' 
+            });
+        }
+
+        const newOccurrence = new Occurrence({
+            title,
+            description,
+            category,
+            location,
+            photoUrl,
+            status: "PENDING",
+            userId: userId || req.userId //testing
+        });
+
+        const savedOccurrence = await newOccurrence.save();
+        res.status(201).json(savedOccurrence);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// [US#22] Get My Occurrences
+itemRESTController.getMyOccurrences = async function(req, res, next){
+    try {
+        const userId = req.userId; // Testing
+        const occurrences = await Occurrence.find({ userId: userId }).sort({ createdAt: -1 });
+        res.json(occurrences);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 module.exports = itemRESTController;
