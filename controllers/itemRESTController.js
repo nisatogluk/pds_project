@@ -1,107 +1,96 @@
 var mongoose = require('mongoose');
-//var Item = require('../models/item');
-var Occurrence = require('../models/occurrence');//new occurence file
+var Item = require('../models/item'); 
+var Occurrence = require('../models/occurrence');
 var itemRESTController = {};
 
-// mostra todos items 
-/*itemRESTController.showAll = async function(req, res,next){
+itemRESTController.showAll = async function(req, res, next){
     try {
-        const dbitems = await Item.find({})
-        console.log(dbitems);
-        res.json(dbitems);
+        const items = await Item.find({})
+        console.log(items);
+        res.json(items);
     } catch(err){
-        console.log('Erro ao ler da base de dados');
+        console.log('Error reading from database');
         next(err);
     }
 }
 
-// mostra 1 item por id
-itemRESTController.show = async function(req, res,next){
+itemRESTController.show = async function(req, res, next){
     try {
-        const dbitems = await Item.findOne({_id:req.params.id})
-        console.log(dbitems);
-        res.json(dbitems);
+        const item = await Item.findOne({_id: req.params.id})
+        console.log(item);
+        res.json(item);
     } catch(err){
-        console.log('Erro ao ler da base de dados');
+        console.log('Error reading from database');
         next(err);
     }
 }
 
-// cria 1 item como resposta a um post de um form
-itemRESTController.create = async function(req,res,next){
+itemRESTController.create = async function(req, res, next){
     try {
         var item = new Item(req.body);
         const itemSaved = await item.save()
         console.log(itemSaved);
         res.json(itemSaved);
     } catch(err){
-        console.log('Erro ao gravar da base de dados');
+        console.log('Error saving to database');
         next(err);
     }
 }
 
-// edita 1 item como resposta a um post de um form editar
-itemRESTController.edit = async function(req,res,next){
+itemRESTController.edit = async function(req, res, next){
     try {
         const editedItem = await Item.findByIdAndUpdate(req.body._id, req.body, { new: true } )
         console.log(editedItem);
         res.json(editedItem);
     } catch(err){
-        console.log('Erro ao atualizar na base de dados');
+        console.log('Error updating database');
         next(err);
     }
 }
 
-// elimina 1 item
-itemRESTController.delete = async function(req, res,next){
+itemRESTController.delete = async function(req, res, next){
     try {
-        const deleteItem = await Item.findByIdAndDelete({_id:req.params.id})
-        console.log(deleteItem);
-        res.json(deleteItem);
+        const deletedItem = await Item.findByIdAndDelete({_id: req.params.id})
+        console.log(deletedItem);
+        res.json(deletedItem);
     } catch(err){
-        console.log('Erro ao remover da base de dados');
+        console.log('Error removing from database');
         next(err);
     }
 }
-*/
 
-// [US#20] Create Occurrence
-itemRESTController.createOccurrence = async function(req, res, next){
+itemRESTController.createOccurrence = async function (req, res) {
     try {
-        const { title, description, category, location, photoUrl, userId } = req.body; 
+        const { title, description, category, location, photoUrl } = req.body;
 
-        if (!description || !category || !location || !photoUrl) {
-            return res.status(400).json({ 
-                message: 'All required fields must be filled.' 
-            });
-        }
-
-        const newOccurrence = new Occurrence({
+        const newOccurrence = new Item({
             title,
             description,
             category,
             location,
             photoUrl,
-            status: "PENDING",
-            userId: userId || req.userId //testing
+            // Alteração: Vamos garantir que o ID é lido corretamente
+            userId: req.user.id || req.user._id 
         });
 
-        const savedOccurrence = await newOccurrence.save();
-        res.status(201).json(savedOccurrence);
-
+        await newOccurrence.save();
+        console.log("Ocorrência gravada com o ID:", newOccurrence.userId); // Isto ajuda a ver no terminal
+        res.status(201).json(newOccurrence);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// [US#22] Get My Occurrences
-itemRESTController.getMyOccurrences = async function(req, res, next){
+itemRESTController.getMyOccurrences = async function(req, res, next) {
     try {
-        const userId = req.userId; // Testing
-        const occurrences = await Occurrence.find({ userId: userId }).sort({ createdAt: -1 });
+        const userId = req.user.id;
+        
+        const occurrences = await Item.find({ userId: userId }).sort({ createdAt: -1 });
+        
         res.json(occurrences);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 module.exports = itemRESTController;
