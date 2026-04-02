@@ -17,7 +17,7 @@ authController.register = async function (req, res) {
             name,
             email,
             password: hashedPassword,
-            status: 'PENDING',
+            status: '',
             role: 'Contributor'
         });
 

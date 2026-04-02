@@ -14,7 +14,7 @@ function verifyToken(req, res, next) {
         req.user = decoded; // guarda os dados do utilizador no request
         next(); // continua para o controller
     } catch (error) {
-        return res.status(401).json({ message: "Token inválido." });
+        return res.status(401).json({ message: "Token inválido." }); //.
     }
 }
 

@@ -5,6 +5,6 @@ var verifyToken= require('../middleware/authMiddleware');
 router.post('/register', authController.register);
 router.get('/confirm/email', authController.confirmEmail);
 router.post('/login', authController.login);
-router.put('/change-password', verifyToken, authController.changePassword);
+router.put('/change-password', verifyToken, authController.changePassword); //.
 
 module.exports = router;
