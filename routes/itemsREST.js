@@ -12,5 +12,5 @@ router.delete('/delete/:id', itemRESTController.delete );
 */
 router.post('/occurrence', itemRESTController.createOccurrence);
 router.get('/my-occurrences', itemRESTController.getMyOccurrences);
-
+router.get('/map', itemRESTController.getPublicMapOccurrences);
 module.exports = router;

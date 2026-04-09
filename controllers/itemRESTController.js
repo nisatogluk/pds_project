@@ -104,4 +104,21 @@ itemRESTController.getMyOccurrences = async function(req, res, next){
         res.status(500).json({ error: error.message });
     }
 };
+
+// [US#23][RF8] Get Public Occurrences for Map
+itemRESTController.getPublicMapOccurrences = async function(req, res, next) {
+    try {
+        // filter
+        const visibleStatuses = ['APPROVED', 'IN_RESOLUTION', 'SOLVED'];
+        const occurrences = await Occurrence.find({ 
+            status: { $in: visibleStatuses } ,
+            latitude: { $exists: true , $ne: null}, 
+            longitude: { $exists: true , $ne: null } 
+        }).select('title status photoUrl latitude longitude _id'); 
+
+        res.json(occurrences);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 module.exports = itemRESTController;

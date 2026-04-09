@@ -35,6 +35,14 @@ var OccurrenceSchema = new mongoose.Schema({
 
 
     },
+    longitude:{
+        type:Number,
+        required:false
+    },
+    latitude:{
+        type:Number,
+        required:false
+    },
 
     photoUrl: {
 
@@ -73,7 +81,5 @@ var OccurrenceSchema = new mongoose.Schema({
     }
 
 });
-
-
 
 module.exports = mongoose.model('Occurrence', OccurrenceSchema);
