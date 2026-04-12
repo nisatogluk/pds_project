@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reports</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .navbar {
+            background: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #4338ca;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .report-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .report-info {
+            flex-grow: 1;
+        }
+
+        .report-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+            color: #1f2937;
+        }
+
+        .report-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        .status-tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Status COLORS */
+        .status-APPROVED {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-PENDING {
+            background: #fef9c3;
+            color: #e9c915;
+        }
+
+        .status-REJECTED {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-SOLVED {
+            background: #e0e7ff;
+            color: #1c10ff;
+        }
+
+        .status-UNDER_ANALYSIS {
+            background: #dbeafe;
+            color: #1eafaf;
+        }
+
+        .status-IN_RESOLUTION {
+            background: #fce7f3;
+            color: #590d5e;
+        }
+
+
+        .view-btn {
+            text-decoration: none;
+            color: #4338ca;
+            font-weight: bold;
+            border: 1px solid #4338ca;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .view-btn:hover {
+            background: #4338ca;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="/map.html" class="nav-link">🏠 Map</a>
+        <a href="/create-occurrence.html" class="nav-link">➕ Report New Incident</a>
+        <a href="/my-occurrences.html" class="nav-link">📋 My Occurrences</a>
+    </div>
+
+    <div class="container" id="reports-list">
+        <h2>My Submitted Reports</h2>
+        <p id="loading-msg">Loading your reports...</p>
+    </div>
+
+    <script>
+
+        const token = localStorage.getItem('token'); 
+
+        fetch('/api/v1/occurrences/my-occurrences', {
+            method: 'GET', 
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Unauthorized or Server Error');
+                return res.json();
+            })
+            .then(data => {
+                const list = document.getElementById('reports-list');
+                document.getElementById('loading-msg').style.display = 'none';
+
+                if (data.length === 0) {
+                    list.innerHTML += '<p>You haven\'t reported any incidents yet.</p>';
+                    return;
+                }
+
+                data.forEach(occ => {
+                    const card = document.createElement('div');
+                    card.className = 'report-card';
+                    card.innerHTML = `
+                        <img src="${occ.photoUrl}" alt="Photo">
+                        <div class="report-info">
+                            <p class="report-title">${occ.title}</p>
+                            <div class="report-meta">
+                                <span class="status-tag status-${occ.status}">${occ.status}</span>
+                                <span> • ${new Date(occ.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <a href="/details.html?id=${occ._id}" class="view-btn">Details</a>
+                    `;
+                    list.appendChild(card);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('loading-msg').innerText = "Failed to load reports.";
+            });
+    </script>
+</body>
+
+</html>

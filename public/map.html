@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Occurrence Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 100vh; width: 100%; } 
+      .navbar {
+        position: fixed;    
+        top: 10px;          
+        left: 100px;        
+        z-index: 9999;      
+        background: white;
+        padding: 10px 20px;
+        display: flex;
+        gap: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    #map { 
+        height: 100vh; 
+        width: 100%; 
+    }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="navbar">
+        <a href="/create-occurrence.html" style="font-size: 20px;">➕ Report New Incident</a>
+        <a href="/my-occurrences.html"style="font-size: 20px;">📋 My Occurrences</a>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // coordinates of Porto 
+        const map = L.map('map').setView([41.15, -8.61], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        //  API ENDPOINT
+        fetch('/api/v1/occurrences/map')
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(occ => {
+                    if(occ.latitude && occ.longitude) {
+                        L.marker([occ.latitude, occ.longitude])
+                            .addTo(map)
+                            .bindPopup(`
+                                <strong>${occ.title}</strong><br>
+                                Status: ${occ.status}<br>
+                                 <img class="popup-photo" src="${occ.photoUrl}" alt="${occ.title}" style="width:100px; height:auto; margin-bottom:10px; border-radius:5px;">
+                                 <p></p>
+                                <a style="color: red;" target="_blank" href="/details.html?id=${occ._id}">See More</a>
+                            `);
+                    }
+                });
+            })
+            .catch(err => console.error("Map can not be uploaded:", err));
+    </script>
+</body>
+</html>

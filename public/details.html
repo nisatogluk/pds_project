@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Occurrence Details</title>
+    <style>
+        .navbar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #4338ca;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            color: #1e1b4b;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 700px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .card img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-bottom: 5px solid #4338ca;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .status {
+            font-weight: bold;
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+
+        /* Status COLORS */
+        .status-APPROVED {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-PENDING {
+            background: #fef9c3;
+            color: #e9c915;
+        }
+
+        .status-REJECTED {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-SOLVED {
+            background: #e0e7ff;
+            color: #1c10ff;
+        }
+
+        .status-UNDER_ANALYSIS {
+            background: #dbeafe;
+            color: #1eafaf;
+        }
+
+        .status-IN_RESOLUTION {
+            background: #fce7f3;
+            color: #590d5e;
+        }
+
+        h1 {
+            margin: 10px 0;
+            color: #111827;
+            font-size: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 25px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .info-item {
+            font-size: 0.95rem;
+            color: #4b5563;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #1f2937;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .description {
+            margin-top: 20px;
+            line-height: 1.8;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #4338ca;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="/create-occurrence.html" class="nav-link">➕ Report New Incident</a>
+        <a href="/my-occurrences.html" class="nav-link">📋 My Occurrences</a>
+    </div>
+    <div class="card" id="details-card" style="display: none;">
+        <img id="occ-image" src="" alt="Occurrence Image">
+        <div class="content">
+            <div class="header-row">
+                <span class="category" id="occ-category"></span>
+                <span id="occ-status-badge" class="status"></span>
+            </div>
+
+            <h1 id="occ-title"></h1>
+            <p class="description" id="occ-description"></p>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">📍 Location</span>
+                    <span id="occ-location"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📅 Created At</span>
+                    <span id="occ-date"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">🌐 Coordinates</span>
+                    <span id="occ-coords"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">👤 User Reference</span>
+                    <span id="occ-user" style="font-size: 0.8rem;"></span>
+                </div>
+            </div>
+
+            <div class="footer">
+                <a href="/map.html" class="back-btn">← Return to Map</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const occId = urlParams.get('id');
+
+        if (occId) {
+            fetch(`/api/v1/occurrences/${occId}`)
+                .then(res => res.json())
+                .then(occ => {
+                    document.getElementById('occ-image').src = occ.photoUrl;
+                    document.getElementById('occ-category').innerText = occ.category;
+                    document.getElementById('occ-title').innerText = occ.title;
+                    document.getElementById('occ-description').innerText = occ.description;
+                    document.getElementById('occ-location').innerText = occ.location;
+
+                    // DATE REFINE
+                    const date = new Date(occ.createdAt);
+                    document.getElementById('occ-date').innerText = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
+                    // COORDINATES
+                    document.getElementById('occ-coords').innerText = `${occ.latitude}, ${occ.longitude}`;
+
+                    // User ID
+                    document.getElementById('occ-user').innerText = occ.userId;
+
+                    // Status 
+                    const statusBadge = document.getElementById('occ-status-badge');
+                    statusBadge.innerText = occ.status;
+                    statusBadge.classList.add('status-' + occ.status);
+
+                    document.getElementById('details-card').style.display = 'block';
+                })
+                .catch(err => console.error("Error:", err));
+        }
+    </script>
+</body>
+
+</html>

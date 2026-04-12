@@ -66,13 +66,24 @@ itemRESTController.delete = async function(req, res,next){
 */
 
 // [US#20] Create Occurrence
-itemRESTController.createOccurrence = async function(req, res, next){
-    try {
-        const { title, description, category, location, photoUrl, userId } = req.body; 
 
-        if (!description || !category || !location || !photoUrl) {
-            return res.status(400).json({ 
-                message: 'All required fields must be filled.' 
+itemRESTController.createOccurrence = async function (req, res, next) {
+    try {
+        
+        const {
+            title,
+            description,
+            category,
+            location,
+            latitude,
+            longitude,
+            photoUrl
+        } = req.body;
+
+
+        if (!category || !location || !photoUrl) {
+            return res.status(400).json({
+                message: 'All required fields must be filled.'
             });
         }
 
@@ -81,9 +92,12 @@ itemRESTController.createOccurrence = async function(req, res, next){
             description,
             category,
             location,
+            latitude,
+            longitude,
             photoUrl,
             status: "PENDING",
-            userId: userId || req.userId //testing
+            userId: req.user.id   
+            
         });
 
         const savedOccurrence = await newOccurrence.save();
@@ -95,10 +109,15 @@ itemRESTController.createOccurrence = async function(req, res, next){
 };
 
 // [US#22] Get My Occurrences
-itemRESTController.getMyOccurrences = async function(req, res, next){
+itemRESTController.getMyOccurrences = async function (req, res, next) {
     try {
-        const userId = req.userId; // Testing
-        const occurrences = await Occurrence.find({ userId: userId }).sort({ createdAt: -1 });
+
+         
+        const userId = req.user.id;   // ✅ FIX: correct source
+
+        const occurrences = await Occurrence
+            .find({ userId })
+            .sort({ createdAt: -1 });
         res.json(occurrences);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -106,19 +125,35 @@ itemRESTController.getMyOccurrences = async function(req, res, next){
 };
 
 // [US#23][RF8] Get Public Occurrences for Map
-itemRESTController.getPublicMapOccurrences = async function(req, res, next) {
+itemRESTController.getPublicMapOccurrences = async function (req, res, next) {
     try {
         // filter
         const visibleStatuses = ['APPROVED', 'IN_RESOLUTION', 'SOLVED'];
-        const occurrences = await Occurrence.find({ 
-            status: { $in: visibleStatuses } ,
-            latitude: { $exists: true , $ne: null}, 
-            longitude: { $exists: true , $ne: null } 
-        }).select('title status photoUrl latitude longitude _id'); 
+        const occurrences = await Occurrence.find({
+            status: { $in: visibleStatuses },
+            latitude: { $exists: true, $ne: null },
+            longitude: { $exists: true, $ne: null }
+        }).select('title status photoUrl latitude longitude _id');
 
         res.json(occurrences);
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+};
+//See more Link with related place
+itemRESTController.show = async function (req, res, next) {
+    try {
+
+        const occurrence = await Occurrence.findById(req.params.id);
+
+        if (!occurrence) {
+            return res.status(404).json({ message: "Cannot found!" });
+        }
+        console.log(occurrence);
+        res.json(occurrence);
+    } catch (err) {
+        console.log('Database error');
+        res.status(500).json({ error: err.message });
     }
 };
 module.exports = itemRESTController;

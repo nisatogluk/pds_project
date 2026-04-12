@@ -10,7 +10,10 @@ router.post('/create', itemRESTController.create);
 router.put('/edit/:id', itemRESTController.edit);
 router.delete('/delete/:id', itemRESTController.delete );
 */
-router.post('/occurrence', itemRESTController.createOccurrence);
-router.get('/my-occurrences', itemRESTController.getMyOccurrences);
+const verifyToken = require('../middleware/authMiddleware');
+router.post('/occurrence', verifyToken, itemRESTController.createOccurrence);
+//router.post('/occurrence', itemRESTController.createOccurrence);  
+router.get('/my-occurrences', verifyToken, itemRESTController.getMyOccurrences);
 router.get('/map', itemRESTController.getPublicMapOccurrences);
+router.get('/:id', itemRESTController.show);//see more
 module.exports = router;
