@@ -2,6 +2,7 @@
     //var Item = require('../models/item');
     var Occurrence = require('../models/occurrence');//new occurence file
     var itemRESTController = {};
+    var User = require('../models/user'); // já deve existir ou adiciona esta linha
 
     // mostra todos items
     /*itemRESTController.showAll = async function(req, res,next){
@@ -107,12 +108,18 @@
     // [US#XX] Add Comment to Occurrence
     itemRESTController.addComment = async function(req, res, next) {
         try {
-            const { text, authorName } = req.body;
-            const authorId = req.userId; // vem do middleware de auth
+            const { text } = req.body;
+            const authorId = req.user.id; // vem do token JWT
 
             // Validação: campo vazio
             if (!text || text.trim() === '') {
                 return res.status(400).json({ message: 'Comment cannot be empty.' });
+            }
+
+            // Vai buscar o nome do utilizador à BD
+            const user = await User.findById(authorId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found.' });
             }
 
             const occurrence = await Occurrence.findById(req.params.id);
@@ -123,7 +130,7 @@
             const newComment = {
                 text: text.trim(),
                 authorId,
-                authorName,
+                authorName: user.name, // nome vindo da BD
                 createdAt: new Date()
             };
 
@@ -141,8 +148,8 @@
     itemRESTController.deleteComment = async function(req, res, next) {
         try {
             const { id, commentId } = req.params;
-            const requestingUserId = req.userId;
-            const requestingUserRole = req.userRole; // assumindo que o middleware coloca o role
+            const requestingUserId = req.user.id;
+            const requestingUserRole = req.user.role; // assumindo que o middleware coloca o role
 
             const occurrence = await Occurrence.findById(id);
             if (!occurrence) {
@@ -155,7 +162,7 @@
             }
 
             const isAuthor = comment.authorId.toString() === requestingUserId.toString();
-            const isAdmin = requestingUserRole === 'ADMIN';
+            const isAdmin = requestingUserRole === 'Admin';
 
             // Só o autor ou um admin podem apagar
             if (!isAuthor && !isAdmin) {
