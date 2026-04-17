@@ -11,7 +11,7 @@ This project was developed in collaboration with a team of students using GitLab
 - Implemented occurrence creation, listing, and retrieval features
 - Developed interactive map view for displaying reported incidents
 - Assisted in backend API development and debugging
-- 
+  
 # Technologies Used
 - Node.js
 - Express.js
