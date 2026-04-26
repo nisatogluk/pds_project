@@ -7,6 +7,72 @@
     <title>Report Incident</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        /* MOBILE FIX */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .form-card,
+            .container,
+            .card {
+                width: 100%;
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            .coord-group {
+                flex-direction: column;
+            }
+
+            #map {
+                height: 100vh;
+            }
+
+            .report-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .report-card img {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        /* TOast FIX */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #16a34a;
+        }
+
+        .toast.error {
+            background: #dc2626;
+        }
+
+        /* map FIX */
         body {
             font-family: sans-serif;
             background: #f0f2f5;
@@ -114,7 +180,7 @@
             </select>
 
             <label>Description</label>
-            <textarea id="description" placeholder="Describe the issue..." ></textarea>
+            <textarea id="description" placeholder="Describe the issue..."></textarea>
 
             <label>Location Name</label>
             <input type="text" id="location" placeholder="e.g. Porto City Center" required>
@@ -178,7 +244,6 @@
             });
         });
 
-
         document.getElementById('my-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const msg = document.getElementById('message');
@@ -195,30 +260,40 @@
                         ? "https://img.freepik.com/premium-vektor/duz-stil-yukleme-cubugu-simgesi-ilerleme-gostergesi-vektor-cizimi-izole-arka-planda-indirme-dugmesi-isareti-is-kavrami_157943-15776.jpg"
                         : ""),
                 // userId: "69c0429ac801ac89d45aeeb8" -->test it with your user ıd 
-                
+
             };
 
             try {
                 console.log(localStorage.getItem('token'));
-                
+
                 const res = await fetch('/api/v1/occurrences/occurrence', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' ,'Authorization': token ? `Bearer ${token}` : ""},
+                    headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : "" },
                     body: JSON.stringify(data)
                 });
 
                 if (res.ok) {
-                    msg.innerHTML = "<b style='color:green'>✅ Success! Redirecting to map...</b>";
+                    showToast("✅ Report submitted successfully!", "success");
                     setTimeout(() => window.location.href = '/map.html', 1500);
                 } else {
                     const errData = await res.json();
-                    msg.innerHTML = "<b style='color:red'>❌ Error: " + (errData.message || "Something went wrong") + "</b>";
+                    showToast("❌ " + (errData.message || "Something went wrong"), "error");
                 }
             } catch (error) {
-                msg.innerHTML = "<b style='color:red'>❌ Server is not responding.</b>";
+                showToast("❌ Server is not responding", "error");
             }
         });
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.className = `toast show ${type}`;
+
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
     </script>
+    <div id="toast" class="toast"></div>
 </body>
 
 </html>

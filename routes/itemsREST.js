@@ -11,9 +11,13 @@ router.post('/create', itemRESTController.create);
 router.put('/edit/:id', itemRESTController.edit);
 router.delete('/delete/:id', itemRESTController.delete );
 */
-router.post('/occurrence', itemRESTController.createOccurrence);
-router.get('/my-occurrences', itemRESTController.getMyOccurrences);
-router.post('/occurrence/:id/comments', authMiddleware, itemRESTController.addComment);
-router.delete('/occurrence/:id/comments/:commentId', authMiddleware, itemRESTController.deleteComment);
+
+router.post('/occurrence', authMiddleware, itemRESTController.createOccurrence);
+router.get('/my-occurrences', authMiddleware, itemRESTController.getMyOccurrences);
+router.get('/map', itemRESTController.getPublicMapOccurrences);
+router.get('/:id', itemRESTController.show);//see more
+
+//router.post('/occurrence/:id/comments', authMiddleware, itemRESTController.addComment);
+//router.delete('/occurrence/:id/comments/:commentId', authMiddleware, itemRESTController.deleteComment);
 
 module.exports = router;

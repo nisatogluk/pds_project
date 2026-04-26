@@ -28,7 +28,7 @@ var OccurrenceSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true
+        required: false
     },
     category: {
         type: String,
@@ -46,6 +46,14 @@ var OccurrenceSchema = new mongoose.Schema({
         type: String,
         enum: ['PENDING', 'UNDER_ANALYSIS', 'IN_RESOLUTION', 'APPROVED', 'REJECTED', 'SOLVED'],
         default: 'PENDING'
+    },
+    longitude:{
+        type:Number,
+        required:false
+    },
+    latitude:{
+        type:Number,
+        required:false
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,

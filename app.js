@@ -14,10 +14,7 @@ mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.m
   .then(() => console.log('✅ Connected to DB!'))
   .catch((e) => console.log('❌ Error connecting to DB!'));
 
-/*
-mongoose.connect('mongodb://localhost:27017/app')
-  .then(() => console.log('✅ Local DB Connected!'))
-  */
+
 const app = express();
 app.use(logger('dev'));
 app.use(express.json());
@@ -33,6 +30,7 @@ app.use('/api/v1/occurrences', itemRESTRouter);
 app.use((req, res, next) => next(createError(404)));
 
 app.use((err, req, res, next) => {
+  console.error("!!! ERROR CATCHER !!!", err);
   res.status(err.status || 500).json({ message: err.message });
 });
 
