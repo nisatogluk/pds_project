@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 
+const { STATUS, ROLES } = require('../constants');
+
 var UserSchema = new mongoose.Schema({
   name: { 
     type: String, 
@@ -14,16 +16,16 @@ var UserSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  role: { 
-    type: String, 
-    default: 'Contributor' 
-  },
-  // Campo atualizado para bater com o Diagrama de Estados
-  status: { 
-    type: String, 
-    enum: ['PENDING', 'ACTIVE', 'DISABLED', 'SUSPENDED'], 
-    default: 'PENDING' 
-  }
+  status: {
+  type: String,
+  enum: Object.values(STATUS), 
+  default: STATUS.PENDING
+},
+role: {
+  type: String,
+  enum: Object.values(ROLES),
+  default: ROLES.CONTRIBUTOR
+}
 });
 
 module.exports = mongoose.model('User', UserSchema);
