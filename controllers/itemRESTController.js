@@ -6,100 +6,96 @@ var Notification = require('../models/notification');
 var itemRESTController = {};
 
 // [US#20] Create Occurrence
-itemRESTController.createOccurrence = async function (req, res) {
-  try {
-    const newOccurrence = new Occurrence({
-      ...req.body,
-      userId: req.user.id 
-    });
-    await newOccurrence.save();
-    res.status(201).json(newOccurrence);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+itemRESTController.createOccurrence = async function (req, res, next) {
+    try {
+        const { title, description, category, location, latitude, longitude, photoUrl } = req.body;
+        const currentUserId = req.user ? (req.user.id || req.user._id) : null;
+
+        if (!currentUserId) {
+            return res.status(401).json({ message: "Token is missing or invalid." });
+        }
+
+        if (!title || !category || !location || !photoUrl) {
+            return res.status(400).json({ message: 'All required fields must be filled.' });
+        }
+
+        const newOccurrence = new Occurrence({
+            title,
+            description,
+            category,
+            location,
+            latitude,
+            longitude,
+            photoUrl,
+            status: "PENDING",
+            userId: currentUserId
+        });
+
+        await newOccurrence.save();
+        res.status(201).json(newOccurrence);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 // [US#22] Get My Occurrences
-itemRESTController.getMyOccurrences = async function(req, res, next) {
+itemRESTController.getMyOccurrences = async function (req, res, next) {
     try {
-        const occurrences = await Occurrence.find({ userId: req.userId }).sort({ createdAt: -1 });
+        const userId = req.user ? (req.user.id || req.user._id) : null;
+        const occurrences = await Occurrence.find({ userId: userId }).sort({ createdAt: -1 });
         res.json(occurrences);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// [US#XX] Add Comment
-itemRESTController.addComment = async function(req, res, next) {
+// [US#23][RF8] Get Public Occurrences for Map
+itemRESTController.getPublicMapOccurrences = async function (req, res, next) {
     try {
-        const { text } = req.body;
-        const user = await User.findById(req.user.id);
+        const visibleStatuses = ['APPROVED', 'IN_RESOLUTION', 'SOLVED'];
+        const occurrences = await Occurrence.find({
+            status: { $in: visibleStatuses },
+            latitude: { $exists: true, $ne: null },
+            longitude: { $exists: true, $ne: null }
+        }).select('title status photoUrl latitude longitude _id');
+
+        res.json(occurrences);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// See more Link with related place
+itemRESTController.show = async function (req, res, next) {
+    try {
         const occurrence = await Occurrence.findById(req.params.id);
-        
-        const newComment = { text, authorId: req.user.id, authorName: user.name, createdAt: new Date() };
-        occurrence.comments.push(newComment);
-        await occurrence.save();
-
-
-        if (occurrence.userId.toString() !== req.user.id.toString()) {
-            const novaNotificacao = new Notification({
-                userId: occurrence.userId, 
-                occurrenceId: occurrence._id,
-                message: `${user.name} commented on your occurrence.`,
-                type: 'NEW_COMMENT'
-            });
-            await novaNotificacao.save();
+        if (!occurrence) {
+            return res.status(404).json({ message: "Occurrence not found!" });
         }
-
-        res.status(201).json(newComment);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.json(occurrence);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };
 
-// [US#XX] Delete Comment
-itemRESTController.deleteComment = async function(req, res, next) {
-    try {
-        const occurrence = await Occurrence.findById(req.params.id);
-        occurrence.comments.pull(req.params.commentId);
-        await occurrence.save();
-        res.status(200).json({ message: 'Comment deleted.' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-itemRESTController.updateStatus = async function (req, res) {
+// Function to update the occurrence status
+itemRESTController.updateStatus = async function(req, res) {
   try {
     const { status } = req.body;
-    const { id } = req.params;
+    
+    const updatedOccurrence = await Occurrence.findByIdAndUpdate(
+      req.params.id, 
+      { status: status }, 
+      { new: true }
+    );
 
-    // Find the occurrence first to get the owner's ID
-    const occurrence = await Occurrence.findById(id);
-
-    if (!occurrence) {
-      return res.status(404).json({ message: "Occurrence not found" });
+    if (!updatedOccurrence) {
+      return res.status(404).json({ message: "Occurrence not found." });
     }
 
-    // Update the occurrence status
-    occurrence.status = status;
-    await occurrence.save();
-
-    // Create a new notification for the owner of the occurrence
-    const newNotification = new Notification({
-      userId: occurrence.userId, 
-      occurrenceId: occurrence._id,
-      message: `The status of your occurrence "${occurrence.title}" was updated to ${status}.`,
-      type: 'STATUS_UPDATE'
-    });
-
-    // Save notification to the database
-    await newNotification.save();
-
-    res.status(200).json({ message: "Success! Status updated and user notified." });
+    res.status(200).json(updatedOccurrence);
   } catch (error) {
-    // If validation fails (like the enum error), it will show here
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Error updating status.", error: error.message });
   }
 };
 
