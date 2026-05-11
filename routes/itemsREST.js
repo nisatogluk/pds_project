@@ -13,7 +13,8 @@ router.delete('/delete/:id', itemRESTController.delete );
 router.post('/occurrence', authMiddleware, itemRESTController.createOccurrence);
 router.get('/my-occurrences', authMiddleware, itemRESTController.getMyOccurrences);
 router.get('/map', itemRESTController.getPublicMapOccurrences);
-router.get('/:id', itemRESTController.show);//see more
+router.get('/:id', itemRESTController.show);
+router.put('/:id/status', itemRESTController.updateStatus);
 
 //router.post('/occurrence/:id/comments', authMiddleware, itemRESTController.addComment);
 //router.delete('/occurrence/:id/comments/:commentId', authMiddleware, itemRESTController.deleteComment);
