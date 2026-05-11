@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Occurrence Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 10px;
+            left: 50px;
+            z-index: 9999;
+            background: white;
+            padding: 10px 15px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            border-radius: 2px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #4338ca;
+        }
+
+        /* LOADER */
+         .loader {
+            width: 50px;
+            height: 50px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4338ca;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 100px auto 0 auto;
+            display: block;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 5px;
+                padding: 8px;
+            }
+
+            .navbar a {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOADING SPINNER -->
+    <div id="loader" class="loader"></div>
+
+    <div id="map"></div>
+
+    <div class="navbar">
+        <a href="/create-occurrence.html">➕ Report</a>
+        <a href="/my-occurrences.html">📋 My Reports</a>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const loader = document.getElementById('loader');
+
+        // Porto coordinates
+        const map = L.map('map').setView([41.15, -8.61], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // FETCH DATA
+        fetch('/api/v1/occurrences/map')
+            .then(res => res.json())
+            .then(data => {
+
+                loader.style.display = 'none'; // loader off
+
+                data.forEach(occ => {
+                    if (occ.latitude && occ.longitude) {
+                        L.marker([occ.latitude, occ.longitude])
+                            .addTo(map)
+                            .bindPopup(`
+                                <strong>${occ.title}</strong><br>
+                                Status: ${occ.status}<br>
+                                <img src="${occ.photoUrl}" 
+                                     style="width:100px; border-radius:5px; margin:5px 0;">
+                                <br>
+                                <a style="color:red;" target="_blank" href="/details.html?id=${occ._id}">
+                                    See More
+                                </a>
+                            `);
+                    }
+                });
+            })
+            .catch(err => {
+                console.error("Map error:", err);
+                loader.style.display = 'none';
+                alert("❌ Failed to load map data");
+            });
+    </script>
+
+</body>
+
+</html>
