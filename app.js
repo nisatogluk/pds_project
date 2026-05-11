@@ -11,6 +11,7 @@ const swaggerDocument = require('./swagger/swagger.json');
 
 const authRouter = require('./routes/auth');
 const itemRESTRouter = require('./routes/itemsREST');
+const notificationsRouter = require('./routes/notificationsREST'); // A nova rota!
 
 mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.mongodb.net/?appName=ProjetoSoftware')
   .then(() => console.log('✅ Connected to DB!'))
@@ -26,8 +27,9 @@ app.use(express.static('public'));//public frontend maps
 
 app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1/auth', authRouter);
-
 app.use('/api/v1/occurrences', itemRESTRouter);
+app.use('/api/v1/notifications', notificationsRouter); // O novo link!
+
 app.use((req, res, next) => next(createError(404)));
 
 app.use((err, req, res, next) => {

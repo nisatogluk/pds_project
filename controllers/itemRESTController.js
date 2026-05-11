@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Occurrence = require('../models/occurrence');
 var User = require('../models/user');
+var Notification = require('../models/notification');
 
 var itemRESTController = {};
 
