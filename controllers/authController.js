@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 
 const authController = {};
 
+const { STATUS, ROLES } = require('../constants');
+
 authController.register = async function (req, res) {
     try {
         const { name, email, password } = req.body;
@@ -17,8 +19,8 @@ authController.register = async function (req, res) {
             name,
             email,
             password: hashedPassword,
-            status: 'PENDING',
-            role: 'Contributor'
+            status: STATUS.PENDING,
+            role: ROLES.CONTRIBUTOR
         });
 
         await newUser.save();
@@ -47,7 +49,7 @@ authController.login = async function (req, res) {
             return res.status(401).json({ message: "Credenciais inválidas." });
         }
 
-        if (user.status === 'PENDING') {
+        if (user.status === STATUS.PENDING) {
             return res.status(403).json({ message: "Conta não ativada." });
         }
 

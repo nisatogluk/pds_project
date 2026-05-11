@@ -1,5 +1,7 @@
 const createError = require('http-errors');
 const express = require('express');
+const cookieParser = require('cookie-parser')const createError = require('http-errors'const createError = require('http-errors');
+const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
@@ -13,7 +15,6 @@ const itemRESTRouter = require('./routes/itemsREST');
 mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.mongodb.net/?appName=ProjetoSoftware')
   .then(() => console.log('✅ Connected to DB!'))
   .catch((e) => console.log('❌ Error connecting to DB!'));
-
 
 const app = express();
 app.use(logger('dev'));
