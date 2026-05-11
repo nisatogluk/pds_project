@@ -1,15 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var authController = require('../controllers/authController');
 
-const authController = require('../controllers/authController');
-const userController = require('../controllers/userController');
-const authMiddleware = require('../middleware/authMiddleware');
-const verifyToken = require('../middleware/authMiddleware');
+var authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/register', authController.register);
 router.get('/confirm/email', authController.confirmEmail);
 router.post('/login', authController.login);
-router.put('/profile', authMiddleware, userController.updateUserProfile);
-router.put('/change-password', verifyToken, authController.changePassword);
+
+router.put('/change-password', authMiddleware.verifyToken, authController.changePassword);
 
 module.exports = router;
