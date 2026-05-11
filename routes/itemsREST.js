@@ -3,19 +3,13 @@ const router = express.Router();
 const itemRESTController = require('../controllers/itemRESTController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// [US#20] Create Occurrence
 router.post('/occurrence', authMiddleware, itemRESTController.createOccurrence);
-
-// [US#22] Get My Occurrences
 router.get('/my-occurrences', authMiddleware, itemRESTController.getMyOccurrences);
+router.get('/map', itemRESTController.getPublicMapOccurrences);
+router.get('/:id', itemRESTController.show);
 
-// [US#XX] Add Comment
-router.post('/occurrence/:id/comments', authMiddleware, itemRESTController.addComment);
-
-// [US#XX] Delete Comment
-router.delete('/occurrence/:id/comments/:commentId', authMiddleware, itemRESTController.deleteComment);
-
-// [US#21] Update Status - THIS WAS MISSING!
 router.put('/:id/status', authMiddleware, itemRESTController.updateStatus);
+router.post('/:id/comments', authMiddleware, itemRESTController.addComment);
+router.delete('/:id/comments/:commentId', authMiddleware, itemRESTController.deleteComment); // Esta linha!
 
 module.exports = router;
