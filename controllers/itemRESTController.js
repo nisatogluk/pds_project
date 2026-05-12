@@ -26,7 +26,8 @@ itemRESTController.createOccurrence = async function (req, res, next) {
         const newNotification = new Notification({
             userId: currentUserId,
             occurrenceId: savedOccurrence._id,
-            message: `Your occurrence "${title}" was successfully created.`
+            message: `Your occurrence "${title}" was successfully created.`,
+            type: "NEW_OCCURRENCE"
         });
         await newNotification.save();
 
