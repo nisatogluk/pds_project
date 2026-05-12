@@ -1,0 +1,67 @@
+var mongoose = require('mongoose');
+var Item = require('../models/item');
+
+var itemRESTController = {};
+
+// mostra todos items 
+itemRESTController.showAll = async function(req, res,next){
+    try {
+        const dbitems = await Item.find({})
+        console.log(dbitems);
+        res.json(dbitems);
+    } catch(err){
+        console.log('Erro ao ler da base de dados');
+        next(err);
+    }
+}
+
+// mostra 1 item por id
+itemRESTController.show = async function(req, res,next){
+    try {
+        const dbitems = await Item.findOne({_id:req.params.id})
+        console.log(dbitems);
+        res.json(dbitems);
+    } catch(err){
+        console.log('Erro ao ler da base de dados');
+        next(err);
+    }
+}
+
+// cria 1 item como resposta a um post de um form
+itemRESTController.create = async function(req,res,next){
+    try {
+        var item = new Item(req.body);
+        const itemSaved = await item.save()
+        console.log(itemSaved);
+        res.json(itemSaved);
+    } catch(err){
+        console.log('Erro ao gravar da base de dados');
+        next(err);
+    }
+}
+
+// edita 1 item como resposta a um post de um form editar
+itemRESTController.edit = async function(req,res,next){
+    try {
+        const editedItem = await Item.findByIdAndUpdate(req.body._id, req.body, { new: true } )
+        console.log(editedItem);
+        res.json(editedItem);
+    } catch(err){
+        console.log('Erro ao atualizar na base de dados');
+        next(err);
+    }
+}
+
+// elimina 1 item
+itemRESTController.delete = async function(req, res,next){
+    try {
+        const deleteItem = await Item.findByIdAndDelete({_id:req.params.id})
+        console.log(deleteItem);
+        res.json(deleteItem);
+    } catch(err){
+        console.log('Erro ao remover da base de dados');
+        next(err);
+    }
+}
+
+module.exports = itemRESTController;
