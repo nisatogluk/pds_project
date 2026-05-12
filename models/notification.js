@@ -18,7 +18,7 @@ const notificationSchema = new mongoose.Schema({
     }, // Notification text
     type: { 
         type: String, 
-        enum: ['STATUS_UPDATE', 'NEW_COMMENT'],
+        enum: ['STATUS_UPDATE', 'NEW_COMMENT', 'NEW_OCCURRENCE'],
         required: true 
     }, // Action that triggered it
     isRead: { 

@@ -1,0 +1,29 @@
+<div class="profile-container">
+  <div class="user-sidebar">
+    <div class="avatar">{{ user.name.charAt(0) }}</div>
+    <h2>{{ user.name }}</h2>
+    <p class="email">{{ user.email }}</p>
+    <p class="meta">Member since: {{ user.joinedDate | date }}</p>
+    
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <div class="activity-section">
+    <h3>My Reported Occurrences</h3>
+    
+    <div class="occurrences-grid">
+      <div class="occurrence-card" *ngFor="let item of myOccurrences" (click)="viewDetails(item.id)">
+        <div class="card-header">
+          <span class="status-badge" [ngClass]="item.status.toLowerCase()">{{ item.status }}</span>
+          <span class="date">{{ item.date | date:'shortDate' }}</span>
+        </div>
+        <h4>{{ item.title }}</h4>
+        <p>Click to view details →</p>
+      </div>
+
+      <div class="empty-state" *ngIf="myOccurrences.length === 0">
+        <p>You haven't reported any occurrences yet.</p>
+      </div>
+    </div>
+  </div>
+</div>

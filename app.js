@@ -9,11 +9,13 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
 const authRouter = require('./routes/auth');
 const itemRESTRouter = require('./routes/itemsREST');
-const notificationsRouter = require('./routes/notificationsREST'); // A nova rota!
+const notificationsRouter = require('./routes/notificationsREST');
+const usersRouter = require('./routes/usersREST'); 
 
+// DB Connection
 mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.mongodb.net/?appName=ProjetoSoftware')
   .then(() => console.log('✅ Connected to DB!'))
-  .catch((e) => console.log('❌ Error connecting to DB!'));
+  .catch((e) => console.log('❌ Error connecting to DB!', e));
 
 
 const app = express();
@@ -24,13 +26,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
-app.use(express.static('public'));//public frontend maps
+app.use(express.static('public'));
 
+// Route Registration
 app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/occurrences', itemRESTRouter);
-app.use('/api/v1/notifications', notificationsRouter); // O novo link!
+app.use('/api/v1/notifications', notificationsRouter);
+app.use('/api/v1/users', usersRouter);
 
+// Error Handling
 app.use((req, res, next) => next(createError(404)));
 
 app.use((err, req, res, next) => {
@@ -40,7 +45,31 @@ app.use((err, req, res, next) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor a correr em http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
+
+module.exports = app;
+
+app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/items', itemsRESTRouter);
+
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.json(err);
+});
+
 
 module.exports = app;
