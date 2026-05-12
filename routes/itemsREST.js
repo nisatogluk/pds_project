@@ -13,3 +13,13 @@ router.post('/:id/comments', authMiddleware.verifyToken, itemRESTController.addC
 router.delete('/:id/comments/:commentId', authMiddleware.verifyToken, itemRESTController.deleteComment);
 
 module.exports = router;
+const authController = require('../controllers/authController');
+
+router.get('/' ,itemRESTController.showAll );
+router.get('/show/:id', itemRESTController.show );
+router.post('/create', itemRESTController.create);
+router.put('/edit/:id', itemRESTController.edit);
+router.delete('/delete/:id', itemRESTController.delete );
+  
+module.exports = router;
+

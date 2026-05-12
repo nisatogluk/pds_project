@@ -10,4 +10,7 @@ router.post('/login', authController.login);
 
 router.put('/change-password', authMiddleware.verifyToken, authController.changePassword);
 
+router.post('/login' ,authController.login );
+router.post('/register', authController.register );
+  
 module.exports = router;
