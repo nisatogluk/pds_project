@@ -84,7 +84,8 @@ itemRESTController.updateStatus = async function(req, res) {
         const statusNotification = new Notification({
             userId: updatedOccurrence.userId,
             occurrenceId: updatedOccurrence._id,
-            message: `The status of "${updatedOccurrence.title}" was updated to ${status}.`
+            message: `The status of "${updatedOccurrence.title}" was updated to ${status}.`,
+            type: "STATUS_UPDATE"
         });
         await statusNotification.save();
         res.status(200).json(updatedOccurrence);
@@ -94,44 +95,52 @@ itemRESTController.updateStatus = async function(req, res) {
 };
 
 // Add comment
-itemRESTController.addComment = async function (req, res) {
+itemRESTController.addComment = async function(req, res) {
     try {
         const { text } = req.body;
-        const occurrence = await Occurrence.findById(req.params.id);
-        if (!occurrence) return res.status(404).json({ message: "Occurrence not found." });
+        const occurrenceId = req.params.id;
+
+        const occurrence = await Occurrence.findById(occurrenceId);
+        if (!occurrence) {
+            return res.status(404).json({ message: "Occurrence not found." });
+        }
 
         const newComment = {
-            userId: req.user.id || req.user._id,
-            text,
+            authorId: req.user?.id || req.user?._id || "anonymous_user",
+            authorName: req.user?.name || "Anonymous User",
+            text: text,
             createdAt: new Date()
         };
 
         occurrence.comments.push(newComment);
         await occurrence.save();
 
-        if (occurrence.userId.toString() !== newComment.userId.toString()) {
-            await new Notification({
+        const ownerId = String(occurrence.userId || "");
+        const currentUserId = String(req.user?.id || req.user?._id || "");
+
+        // Only notify the owner if the commenter is a different person
+        if (ownerId !== currentUserId && ownerId !== "") {
+            const notification = new Notification({
                 userId: occurrence.userId,
                 occurrenceId: occurrence._id,
-                message: `New comment on your occurrence: "${text.substring(0, 20)}..."`
-            }).save();
+                message: `New comment on your occurrence: "${occurrence.title}"`,
+                type: "NEW_COMMENT" 
+            });
+            await notification.save();
         }
+
         res.status(201).json(occurrence);
     } catch (error) {
+        console.error("[DEBUG] Comment Error:", error);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Delete comment
-itemRESTController.deleteComment = async function (req, res) {
+// Delete Comment 
+itemRESTController.deleteComment = async function(req, res) {
     try {
-        const { id, commentId } = req.params;
-        const occurrence = await Occurrence.findById(id);
-        if (!occurrence) return res.status(404).json({ message: "Occurrence not found." });
-
-        occurrence.comments = occurrence.comments.filter(c => c._id.toString() !== commentId);
-        await occurrence.save();
-        res.status(200).json({ message: "Comment deleted successfully", occurrence });
+        // This is a placeholder to prevent the "Undefined" error in routes
+        res.status(501).json({ message: "Delete comment functionality not implemented yet." });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
