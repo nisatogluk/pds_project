@@ -1,0 +1,49 @@
+<div class="container">
+    <div *ngIf="loading" class="loader-container">
+        <div class="loader"></div>
+        <p>Loading details...</p>
+    </div>
+
+    <div *ngIf="!loading && occurrence" class="detail-card">
+
+        <div class="image-container">
+            <img [src]="occurrence.photoUrl || 'assets/no-image.png'" alt="Incident Image">
+        </div>
+
+        <div class="content">
+            <div class="info-row">
+  <span class="info-label">👤 User Reference:</span>
+  <span class="info-value" style="font-size: 0.8rem; color: #666;">
+    {{ occurrence.userId || 'Unknown User' }}
+  </span>
+</div>
+            <span class="category-badge">{{ occurrence.category || 'Incident' }}</span>
+            <h1>{{ occurrence.title }}</h1>
+
+            <p class="description">{{ occurrence.description }}</p>
+
+            <div class="info-row">
+                <span class="info-label">📍 Location:</span>
+                <span class="info-value">{{ occurrence.location }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">🚦 Status:</span>
+                <span class="status" [ngClass]="'status-' + (occurrence.status || 'PENDING')">
+                    {{ occurrence.status }}
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">📅 Date:</span>
+                <span class="info-value">{{ formatDate(occurrence.createdAt) }}</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div *ngIf="!loading && !occurrence" class="loader-container">
+        <p>❌ Report not found.</p>
+        <a routerLink="/my-occurrences" class="back-btn">Go Back</a>
+    </div>
+</div>

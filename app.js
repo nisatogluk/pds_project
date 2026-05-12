@@ -1,14 +1,12 @@
+
 const createError = require('http-errors');
 const express = require('express');
-const cookieParser = require('cookie-parser')const createError = require('http-errors'const createError = require('http-errors');
-const express = require('express');
-const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser')
 const logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
-
 const authRouter = require('./routes/auth');
 const itemRESTRouter = require('./routes/itemsREST');
 const notificationsRouter = require('./routes/notificationsREST'); // A nova rota!
@@ -17,7 +15,10 @@ mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.m
   .then(() => console.log('✅ Connected to DB!'))
   .catch((e) => console.log('❌ Error connecting to DB!'));
 
+
 const app = express();
+app.use(cors());
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

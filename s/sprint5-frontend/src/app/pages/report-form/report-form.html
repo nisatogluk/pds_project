@@ -1,0 +1,70 @@
+<div class="navbar">
+  <a routerLink="/map-view">🏠 Map</a>
+  <a routerLink="/my-occurrences">📋 My Occurrences</a>
+</div>
+
+<div class="form-card">
+  <h3>📢 Report New Incident</h3>
+
+  <form (ngSubmit)="submitForm()">
+    <label>Title</label>
+    <input type="text" [(ngModel)]="title" name="title" placeholder="Enter a title...">
+
+    <label>Category</label>
+    <select [(ngModel)]="category" name="category">
+      <option value="" disabled selected>-- Select a Category --</option>
+      <option value="Event">Event</option>
+      <option value="Infrastructure">Infrastructure</option>
+      <option value="Road Damage">Road Damage</option>
+      <option value="Garbage">Garbage</option>
+      <option value="Traffic">Traffic</option>
+    </select>
+
+    <label>Description</label>
+    <textarea [(ngModel)]="description" name="description" placeholder="Describe the situation..."></textarea>
+
+    <label>Location Name</label>
+    <input type="text" [(ngModel)]="location" name="location" placeholder="e.g. Central Park North">
+
+    <label>Select Location on Map (Click or Enter Coordinates)</label>
+    <div id="map-selection" style="height: 300px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccc;"></div>
+
+    <div class="coord-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
+      <div style="flex: 1;">
+        <label>Latitude</label>
+        <input 
+          type="number" 
+          step="any" 
+          [(ngModel)]="latitude" 
+          name="latitude" 
+          (input)="updateMarkerFromInputs()" 
+          placeholder="e.g. 41.153">
+      </div>
+      <div style="flex: 1;">
+        <label>Longitude</label>
+        <input 
+          type="number" 
+          step="any" 
+          [(ngModel)]="longitude" 
+          name="longitude" 
+          (input)="updateMarkerFromInputs()" 
+          placeholder="e.g. -8.625">
+      </div>
+    </div>
+
+    <label>Photo URL</label>
+    <input type="text" [(ngModel)]="photoUrl" name="photoUrl" placeholder="https://image-link.com/photo.jpg">
+
+    <button type="submit" class="submit-btn">
+      🚀 Submit Report
+    </button>
+  </form>
+</div>
+
+<div id="toast"
+  class="toast"
+  [class.show]="toastVisible"
+  [class.success]="toastType==='success'"
+  [class.error]="toastType==='error'">
+  {{ toastMessage }}
+</div>

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const itemRESTController = require('../controllers/itemRESTController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { verifyToken: authMiddleware } = require('../middleware/authMiddleware');
 
 router.post('/occurrence', authMiddleware, itemRESTController.createOccurrence);
 router.get('/my-occurrences', authMiddleware, itemRESTController.getMyOccurrences);
