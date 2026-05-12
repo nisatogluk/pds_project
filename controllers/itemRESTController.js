@@ -5,7 +5,7 @@ var Notification = require('../models/notification');
 
 var itemRESTController = {};
 
-// [US#20] Create Occurrence with Notification
+// Create Occurrence with Notification
 itemRESTController.createOccurrence = async function (req, res, next) {
     try {
         const { title, description, category, location, latitude, longitude, photoUrl } = req.body;
@@ -37,7 +37,7 @@ itemRESTController.createOccurrence = async function (req, res, next) {
     }
 };
 
-// [US#22] Get My Occurrences
+// Get My Occurrences
 itemRESTController.getMyOccurrences = async function (req, res, next) {
     try {
         const userId = req.user ? (req.user.id || req.user._id) : null;
@@ -48,7 +48,7 @@ itemRESTController.getMyOccurrences = async function (req, res, next) {
     }
 };
 
-// [US#23] Get Public Occurrences for Map
+// Get Public Occurrences for Map
 itemRESTController.getPublicMapOccurrences = async function (req, res, next) {
     try {
         const visibleStatuses = ['APPROVED', 'IN_RESOLUTION', 'SOLVED'];
@@ -141,6 +141,33 @@ itemRESTController.deleteComment = async function(req, res) {
     try {
         // This is a placeholder to prevent the "Undefined" error in routes
         res.status(501).json({ message: "Delete comment functionality not implemented yet." });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Update Occurrence Status - Protected for Admins
+itemRESTController.updateStatus = async (req, res) => {
+    try {
+        
+        if (req.user.role.toLowerCase() !== 'admin') {
+            return res.status(403).json({ 
+            message: "Forbidden: Only administrators can change occurrence status." 
+            });
+        }
+
+        const { status } = req.body;
+        const updatedOccurrence = await Occurrence.findByIdAndUpdate(
+            req.params.id,
+            { $set: { status: status } },
+            { new: true }
+        );
+
+        if (!updatedOccurrence) {
+            return res.status(404).json({ message: "Occurrence not found." });
+        }
+
+        res.status(200).json(updatedOccurrence);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
