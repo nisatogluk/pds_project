@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { DataService } from '../../services/data';
+import { DataService } from '../../../../../s/sprint5-frontend/src/app/services/data';
 import * as L from 'leaflet';
 
 @Component({

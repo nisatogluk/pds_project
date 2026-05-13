@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DataService } from '../../services/data';
+import { DataService } from '../../../../../s/sprint5-frontend/src/app/services/data';
 
 @Component({
   selector: 'app-occurrence-details',
