@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DataService } from '../../../../../s/sprint5-frontend/src/app/services/data';
+import { DataService } from '../../services/data';
 
 @Component({
   selector: 'app-occurrence-details',
@@ -25,13 +25,13 @@ export class OccurrenceDetailsComponent implements OnInit {
 
     if (id) {
       this.dataService.getOccurrenceById(id).subscribe({
-        next: (data) => {
+        next: (data: any) => {
           console.log("Backend'den gelen detay verisi:", data);
           this.occurrence = data;
           this.loading = false; // SPINNER STOPS ✅
           this.cdr.detectChanges(); 
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error("Detay hatası:", err);
           this.loading = false;
           this.cdr.detectChanges();

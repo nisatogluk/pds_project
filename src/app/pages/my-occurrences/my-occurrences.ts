@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { DataService } from '../../../../../s/sprint5-frontend/src/app/services/data';
+import { DataService } from '../../services/data';
 
 @Component({
   selector: 'app-my-occurrences',
@@ -20,13 +20,13 @@ export class MyOccurrencesComponent implements OnInit {
     console.log("Datas are loading...");
 
     this.dataService.getMyOccurrences().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         
         this.reports = [...data];
         this.loading = false;
         this.cdr.detectChanges(); 
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error("Loading Error:", err);
         this.loading = false;
         this.cdr.detectChanges();
