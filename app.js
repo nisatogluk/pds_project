@@ -1,13 +1,12 @@
+
 const createError = require('http-errors');
 const express = require('express');
-const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser')
 const logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
-
-// Import Routers
 const authRouter = require('./routes/auth');
 const itemRESTRouter = require('./routes/itemsREST');
 const notificationsRouter = require('./routes/notificationsREST');
@@ -18,23 +17,9 @@ mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.m
   .then(() => console.log('✅ Connected to DB!'))
   .catch((e) => console.log('❌ Error connecting to DB!', e));
 
-const app = express();
-
-// Middlewares
-
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger/swagger.json')
-
-const itemsRESTRouter = require('./routes/itemsREST');
-const authRouter = require('./routes/auth');
-
-mongoose.Promise = global.Promise
-
-mongoose.connect('mongodb://localhost/app')
-  .then(()=> console.log(' connected to DB!'))
-  .catch((e)=> {console.log(' error connecting to DB!')})
 
 const app = express();
+app.use(cors());
 
 app.use(logger('dev'));
 app.use(express.json());

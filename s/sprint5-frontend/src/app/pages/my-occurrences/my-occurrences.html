@@ -1,0 +1,41 @@
+<div class="navbar">
+    <a routerLink="/map-view" class="nav-link">🏠 Map</a>
+    <a routerLink="/report-form" class="nav-link">➕ Report New Incident</a>
+</div>
+
+<div class="container">
+
+    <h2>My Submitted Reports</h2>
+
+    <div *ngIf="loading" id="loading-msg">
+        <div class="loader"></div>
+        <p>Loading reports...</p>
+    </div>
+
+    <div *ngIf="!loading && reports.length === 0" style="text-align:center; margin-top: 20px;">
+        <p>No reports yet.</p>
+    </div>
+
+    <div *ngIf="!loading && reports.length > 0">
+        <div *ngFor="let occ of reports" class="report-card">
+
+            <img [src]="occ.photoUrl || 'assets/placeholder.png'" alt="Report Image" />
+
+            <div class="report-info">
+                <p class="report-title">{{ occ.title }}</p>
+
+                <div class="report-meta">
+                    <span class="status-tag" [ngClass]="'status-' + (occ.status || 'PENDING')">
+                        {{ occ.status }}
+                    </span>
+                    <span> • {{ formatDate(occ.createdAt) }}</span>
+                </div>
+            </div>
+
+            <a [routerLink]="['/occurrence', occ._id]" class="view-btn">
+                Details
+            </a>
+        </div>
+    </div>
+
+</div>
