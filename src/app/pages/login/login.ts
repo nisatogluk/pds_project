@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   errorMessage: string = '';
-  
+
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -28,18 +28,16 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe({
+      const credentials = this.loginForm.value;
+
+      this.authService.login(credentials).subscribe({
         next: (response) => {
           this.router.navigate(['/home']);
         },
         error: (err) => {
-          this.errorMessage = 'Invalid email or password. Please try again.';
+          this.errorMessage = 'Login failed. Please check your credentials.';
         }
       });
     }
-  }
-
-  onSocialLogin(provider: string): void {
-    alert(`O login com ${provider} estará disponível numa próxima versão! Por favor, usa o teu email e password.`);
   }
 }

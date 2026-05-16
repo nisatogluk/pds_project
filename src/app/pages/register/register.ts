@@ -29,7 +29,6 @@ export class RegisterComponent implements OnInit {
 
   onSubmit(): void {
     if (this.registerForm.valid) {
-      // É aqui que o formData é criado!
       const formData = {
         name: this.registerForm.value.username,
         email: this.registerForm.value.email,
@@ -38,7 +37,7 @@ export class RegisterComponent implements OnInit {
 
       this.authService.register(formData).subscribe({
         next: (response) => {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/account-confirmation']);
         },
         error: (err) => {
           this.errorMessage = 'Registration failed. Check server logs.';

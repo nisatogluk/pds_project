@@ -32,6 +32,10 @@
           <a routerLink="/forgot-password">Forgot password?</a>
         </div>
 
+        <div class="server-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
         <button type="submit" class="auth-btn" [disabled]="loginForm.invalid">
           Continue
         </button>

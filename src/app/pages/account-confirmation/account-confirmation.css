@@ -1,0 +1,71 @@
+.feedback-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f4f6f9; 
+  padding: 0;
+}
+
+.feedback-card {
+  background-color: white;
+  padding: 50px 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  max-width: 450px;
+  width: 90%;
+}
+
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  background-color: #e6f4ff;
+  color: #4db8ff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 25px auto;
+}
+
+.feedback-card h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.main-message {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.spam-alert {
+  background-color: #fff9e6; 
+  color: #856404;
+  padding: 15px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.return-btn {
+  width: 100%;
+  padding: 16px;
+  background-color: #4db8ff; 
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.return-btn:hover {
+  background-color: #3aa3e8; 
+}
