@@ -25,13 +25,13 @@ export class OccurrenceDetailsComponent implements OnInit {
 
     if (id) {
       this.dataService.getOccurrenceById(id).subscribe({
-        next: (data) => {
+        next: (data: any) => {
           console.log("Backend'den gelen detay verisi:", data);
           this.occurrence = data;
           this.loading = false; // SPINNER STOPS ✅
           this.cdr.detectChanges(); 
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error("Detay hatası:", err);
           this.loading = false;
           this.cdr.detectChanges();

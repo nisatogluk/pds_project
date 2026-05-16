@@ -20,13 +20,13 @@ export class MyOccurrencesComponent implements OnInit {
     console.log("Datas are loading...");
 
     this.dataService.getMyOccurrences().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         
         this.reports = [...data];
         this.loading = false;
         this.cdr.detectChanges(); 
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error("Loading Error:", err);
         this.loading = false;
         this.cdr.detectChanges();
