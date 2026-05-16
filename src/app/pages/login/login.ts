@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
+
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   errorMessage: string = '';
