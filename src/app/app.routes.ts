@@ -8,6 +8,7 @@ import { ProfileComponent } from './pages/profile/profile';
 import { ReportFormComponent } from './pages/report-form/report-form';
 import { AccountConfirmationComponent } from './pages/account-confirmation/account-confirmation';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password';
+import { ResetPasswordPage } from './pages/reset-password/reset-password';
 
 
 export const routes: Routes = [
@@ -20,5 +21,6 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'report', component: ReportFormComponent },
   { path: 'account-confirmation', component: AccountConfirmationComponent },
-  { path: 'forgot-password', component: ForgotPasswordPage }
+  { path: 'forgot-password', component: ForgotPasswordPage },
+  { path: 'reset-password', component: ResetPasswordPage }
 ];
