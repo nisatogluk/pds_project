@@ -10,6 +10,7 @@ export class AuthService {
   private loginUrl = 'http://localhost:3000/api/v1/auth/login';
   private registerUrl = 'http://localhost:3000/api/v1/auth/register';
   private forgotPasswordUrl = 'http://localhost:3000/api/v1/auth/forgot-password';
+  private resetPasswordUrl = 'http://localhost:3000/api/v1/auth/reset-password';
 
   login(credentials: any): Observable<any> {
     return this.http.post(this.loginUrl, credentials);
@@ -20,6 +21,10 @@ export class AuthService {
   }
 
   forgotPassword(email: string) {
-  return this.http.post(this.forgotPasswordUrl, { email });
+    return this.http.post(this.forgotPasswordUrl, { email });
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post(this.resetPasswordUrl, { token, newPassword });
   }
 }
