@@ -9,6 +9,8 @@ import { ReportFormComponent } from './pages/report-form/report-form';
 import { AccountConfirmationComponent } from './pages/account-confirmation/account-confirmation';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password';
 import { ResetPasswordPage } from './pages/reset-password/reset-password';
+import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard';
+import { adminGuard } from './guards/admin.guard';
 
 
 export const routes: Routes = [
@@ -22,5 +24,6 @@ export const routes: Routes = [
   { path: 'report', component: ReportFormComponent },
   { path: 'account-confirmation', component: AccountConfirmationComponent },
   { path: 'forgot-password', component: ForgotPasswordPage },
-  { path: 'reset-password', component: ResetPasswordPage }
+  { path: 'reset-password', component: ResetPasswordPage },
+  { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [adminGuard] }
 ];
