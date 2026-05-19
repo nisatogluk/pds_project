@@ -1,0 +1,32 @@
+<div class="dashboard-container">
+  <h1>Admin Dashboard</h1>
+
+  <div *ngIf="isLoading" class="loading">
+    Loading occurrences...
+  </div>
+
+  <div *ngIf="!isLoading && occurrences.length === 0" class="empty-state">
+    No occurrences found.
+  </div>
+
+  <table *ngIf="!isLoading && occurrences.length > 0" class="occurrences-table">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Category</th>
+      <th>Location</th>
+      <th>Date</th>
+      <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let occ of occurrences">
+      <td>{{ occ.title }}</td>
+      <td>{{ occ.category }}</td>
+      <td>{{ occ.location }}</td>
+      <td>{{ occ.createdAt | date:'dd/MM/yyyy' }}</td>
+      <td><span class="status-badge status-{{occ.status | lowercase}}">{{ occ.status }}</span></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
