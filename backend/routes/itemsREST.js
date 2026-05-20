@@ -1,7 +1,8 @@
-/*const express = require('express');
+const express = require('express');
 const router = express.Router();
 const itemRESTController = require('../controllers/itemRESTController');
-const { verifyToken: authMiddleware } = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/authMiddleware');
+
 
 router.post('/occurrence', authMiddleware.verifyToken, itemRESTController.createOccurrence);
 router.get('/my-occurrences', authMiddleware.verifyToken, itemRESTController.getMyOccurrences);
@@ -15,12 +16,10 @@ router.delete('/:id/comments/:commentId', authMiddleware.verifyToken, itemRESTCo
 //module.exports = router;
 //const authController = require('../controllers/authController');
 
-router.get('/' ,itemRESTController.showAll );
+//router.get('/' ,itemRESTController.showAll );
 router.get('/show/:id', itemRESTController.show );
-router.post('/create', itemRESTController.create);
-router.put('/edit/:id', itemRESTController.edit);
-router.delete('/delete/:id', itemRESTController.delete );
+//router.post('/create', itemRESTController.create);
+//router.put('/edit/:id', itemRESTController.edit);
+//router.delete('/delete/:id', itemRESTController.delete );
   
 module.exports = router;
-
-*/
