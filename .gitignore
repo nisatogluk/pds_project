@@ -43,3 +43,6 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 */node_modules
+
+.angular/cache
+ISSUES_FIXED_REPORT.md

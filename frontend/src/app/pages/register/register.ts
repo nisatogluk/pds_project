@@ -23,7 +23,8 @@ export class RegisterComponent implements OnInit {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required]
     });
   }
 
@@ -32,7 +33,8 @@ export class RegisterComponent implements OnInit {
       const formData = {
         name: this.registerForm.value.username,
         email: this.registerForm.value.email,
-        password: this.registerForm.value.password
+        password: this.registerForm.value.password,
+        confirmPassword: this.registerForm.value.confirmPassword
       };
 
       this.authService.register(formData).subscribe({
@@ -40,7 +42,7 @@ export class RegisterComponent implements OnInit {
           this.router.navigate(['/account-confirmation']);
         },
         error: (err) => {
-          this.errorMessage = 'Registration failed. Check server logs.';
+          this.errorMessage = err.error?.message || 'Registration failed.';
         }
       });
     }
