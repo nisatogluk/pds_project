@@ -1,30 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OccurrenceService } from '../../services/occurrence.service';
+import { StatusUpdateModalComponent } from '../../components/status-update-modal/status-update-modal';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StatusUpdateModalComponent],
   templateUrl: './admin-dashboard.html',
-  styleUrl: './admin-dashboard.css'
+  styleUrls: ['./admin-dashboard.css']
 })
-export class AdminDashboardComponent implements OnInit {
-  occurrences: any[] = [];
-  isLoading = true;
+export class AdminDashboardComponent {
+  isModalOpen = false;
+  selectedOccurrenceStatus = 'PENDING';
 
-  constructor(private occurrenceService: OccurrenceService) {}
+  openStatusModal(status: string) {
+    this.selectedOccurrenceStatus = status;
+    this.isModalOpen = true;
+  }
 
-  ngOnInit(): void {
-    this.occurrenceService.getAllOccurrences().subscribe({
-      next: (data: any) => {
-        this.occurrences = data;
-        this.isLoading = false;
-      },
-      error: (err: any) => {
-        console.error('Error fetching occurrences:', err);
-        this.isLoading = false;
-      }
-    });
+  closeStatusModal() {
+    this.isModalOpen = false;
+  }
+
+  handleStatusUpdate(newStatus: string) {
+    console.log('New stateOccurrence value:', newStatus);
   }
 }
