@@ -10,7 +10,9 @@ import { AccountConfirmationComponent } from './pages/account-confirmation/accou
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password';
 import { ResetPasswordPage } from './pages/reset-password/reset-password';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard';
+import { ChangePasswordComponent } from './pages/change-password/change-password';
 import { adminGuard } from './guards/admin.guard';
+
 
 
 export const routes: Routes = [
@@ -26,5 +28,6 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordPage },
   { path: 'reset-password', component: ResetPasswordPage },
   { path: 'admin-dashboard', component: AdminDashboardComponent},
-  { path: 'profile', component: ProfileComponent }
+  { path: 'profile', component: ProfileComponent },
+  { path: 'change-password', component: ChangePasswordComponent }
 ];
