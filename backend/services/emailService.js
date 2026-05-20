@@ -2,10 +2,17 @@ const nodemailer = require('nodemailer');
 
 const emailService = {};
 
-/**
- * Initialize email transporter with environment variables
- */
-const getTransporter = () => {
+const getTransporter = async () => {
+    if (process.env.NODE_ENV === 'development') {
+        return nodemailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 587,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASSWORD
+            }
+        });
+    }
     return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
@@ -21,7 +28,7 @@ const getTransporter = () => {
  */
 emailService.sendConfirmationEmail = async (email, token) => {
     try {
-        const transporter = getTransporter();
+        const transporter = await getTransporter();
         
         const confirmationUrl = `${process.env.FRONTEND_URL || 'http://localhost:4200'}/confirm-email?token=${token}`;
 
@@ -58,7 +65,7 @@ emailService.sendConfirmationEmail = async (email, token) => {
  */
 emailService.sendPasswordResetEmail = async (email, resetToken) => {
     try {
-        const transporter = getTransporter();
+        const transporter = await getTransporter();
         
         const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:4200'}/reset-password?token=${resetToken}`;
 
@@ -96,7 +103,7 @@ emailService.sendPasswordResetEmail = async (email, resetToken) => {
  */
 emailService.sendStatusUpdateEmail = async (email, occurrenceTitle, newStatus) => {
     try {
-        const transporter = getTransporter();
+        const transporter = await getTransporter();
 
         const mailOptions = {
             from: `"Plataforma Cívica" <${process.env.SMTP_USER}>`,
@@ -129,7 +136,7 @@ emailService.sendStatusUpdateEmail = async (email, occurrenceTitle, newStatus) =
  */
 emailService.sendCommentNotificationEmail = async (email, occurrenceTitle, commenterName) => {
     try {
-        const transporter = getTransporter();
+        const transporter = await getTransporter();
 
         const mailOptions = {
             from: `"Plataforma Cívica" <${process.env.SMTP_USER}>`,
