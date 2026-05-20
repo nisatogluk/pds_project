@@ -109,11 +109,11 @@ authController.changePassword = async function (req, res) {
         res.status(500).json({ error });
     }
 };
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+//const jwt = require('jsonwebtoken');
+//const bcrypt = require('bcryptjs');
 const config = require('../jwt_secret/config');
 
-var authController = {};
+//var authController = {};
 
 authController.login = async function (req, res) {
   try {

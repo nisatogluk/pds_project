@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 const itemRESTController = require('../controllers/itemRESTController');
 const { verifyToken: authMiddleware } = require('../middleware/authMiddleware');
@@ -12,8 +12,8 @@ router.put('/:id/status', authMiddleware.verifyToken, itemRESTController.updateS
 router.post('/:id/comments', authMiddleware.verifyToken, itemRESTController.addComment);
 router.delete('/:id/comments/:commentId', authMiddleware.verifyToken, itemRESTController.deleteComment);
 
-module.exports = router;
-const authController = require('../controllers/authController');
+//module.exports = router;
+//const authController = require('../controllers/authController');
 
 router.get('/' ,itemRESTController.showAll );
 router.get('/show/:id', itemRESTController.show );
@@ -23,3 +23,4 @@ router.delete('/delete/:id', itemRESTController.delete );
   
 module.exports = router;
 
+*/

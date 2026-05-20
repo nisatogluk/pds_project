@@ -29,7 +29,7 @@ role: {
 });
 
 module.exports = mongoose.model('User', UserSchema);
-var mongoose = require('mongoose');  
+/*var mongoose = require('mongoose');  
 var UserSchema = new mongoose.Schema({  
   name: String,
   email: String,
@@ -39,3 +39,4 @@ var UserSchema = new mongoose.Schema({
 mongoose.model('User', UserSchema);
 
 module.exports = mongoose.model('User');
+*/

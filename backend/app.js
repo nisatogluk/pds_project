@@ -7,10 +7,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
-const authRouter = require('./routes/auth');
-const itemRESTRouter = require('./routes/itemsREST');
-const notificationsRouter = require('./routes/notificationsREST');
-const usersRouter = require('./routes/usersREST'); 
+//const authRouter = require('./routes/auth');
+//const itemRESTRouter = require('./routes/itemsREST');
+//const notificationsRouter = require('./routes/notificationsREST');
+//const usersRouter = require('./routes/usersREST'); 
 
 // DB Connection
 mongoose.connect('mongodb+srv://LeonorSilva:cjdkGGvr29@projetosoftware.hk3ohtf.mongodb.net/?appName=ProjetoSoftware')
@@ -29,11 +29,11 @@ app.use(cors());
 app.use(express.static('public'));
 
 // Route Registration
-app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/occurrences', itemRESTRouter);
-app.use('/api/v1/notifications', notificationsRouter);
-app.use('/api/v1/users', usersRouter);
+//app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//app.use('/api/v1/auth', authRouter);
+//app.use('/api/v1/occurrences', itemRESTRouter);
+//app.use('/api/v1/notifications', notificationsRouter);
+///app.use('/api/v1/users', usersRouter);
 
 // Error Handling
 app.use((req, res, next) => next(createError(404)));
@@ -50,9 +50,9 @@ app.listen(PORT, () => {
 
 module.exports = app;
 
-app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/items', itemsRESTRouter);
+//app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//app.use('/api/v1/auth', authRouter);
+//app.use('/api/v1/items', itemsRESTRouter);
 
 
 // catch 404 and forward to error handler
