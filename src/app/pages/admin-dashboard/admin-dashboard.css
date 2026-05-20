@@ -62,3 +62,60 @@ h1 {
   .dashboard-container { padding: 1rem; }
   .occurrences-table th, .occurrences-table td { padding: 0.6rem; font-size: 0.85rem; }
 }
+
+.dashboard-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard-header {
+  margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.dashboard-header p {
+  color: #666;
+  margin-top: 5px;
+}
+
+.table-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.occurrence-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.occurrence-table th, .occurrence-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.occurrence-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+}
+
+.occurrence-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.btn-update {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
