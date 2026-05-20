@@ -1,19 +1,38 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { STATUS, ROLES } = require('../constants');
+const emailService = require('../services/emailService');
 
 const authController = {};
 
-const { STATUS, ROLES } = require('../constants');
-
+/**
+ * Register a new user with email confirmation
+ */
 authController.register = async function (req, res) {
     try {
-        const { name, email, password } = req.body;
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: "Email já registado." });
+        const { name, email, password, confirmPassword } = req.body;
+
+        // Validation
+        if (!email || !password || !name) {
+            return res.status(400).json({ message: "Missing required fields." });
         }
 
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: "Passwords do not match." });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({ message: "Password must be at least 8 characters." });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "Email already registered." });
+        }
+
+        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             name,
@@ -24,182 +43,119 @@ authController.register = async function (req, res) {
         });
 
         await newUser.save();
-        res.status(201).json({ message: "Utilizador registado." });
+
+        // Generate confirmation token
+        const confirmationToken = jwt.sign(
+            { id: newUser._id, type: 'email_confirmation' },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        // Send confirmation email
+        try {
+            await emailService.sendConfirmationEmail(newUser.email, confirmationToken);
+            res.status(201).json({ 
+                message: "User registered successfully. Please check your email to confirm your account.",
+                email: newUser.email
+            });
+        } catch (emailError) {
+            console.error("Email sending failed:", emailError);
+            // Still register user, but notify about email issue
+            res.status(201).json({ 
+                message: "User registered, but email confirmation could not be sent. Please try again later.",
+                email: newUser.email
+            });
+        }
     } catch (error) {
-        res.status(500).json({ error });
+        console.error("Registration error:", error);
+        res.status(500).json({ message: "Error registering user." });
     }
 };
 
+/**
+ * Confirm email with token (requires verification token)
+ */
 authController.confirmEmail = async function (req, res) {
     try {
-        const { email } = req.query;
-        await User.findOneAndUpdate({ email }, { status: 'ACTIVE' });
-        res.send("Conta ativada.");
+        // In production, this should use a token sent via email
+        // For now, this endpoint should be protected
+        const { token } = req.body;
+
+        if (!token) {
+            return res.status(400).json({ message: "Verification token required." });
+        }
+
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        if (user.status === STATUS.ACTIVE) {
+            return res.status(400).json({ message: "Account already activated." });
+        }
+
+        user.status = STATUS.ACTIVE;
+        await user.save();
+
+        res.status(200).json({ message: "Email confirmed successfully." });
     } catch (error) {
-        res.status(500).send("Erro.");
+        console.error("Email confirmation error:", error);
+        res.status(500).json({ message: "Invalid or expired token." });
     }
 };
 
+/**
+ * User login
+ */
 authController.login = async function (req, res) {
     try {
         const { email, password } = req.body;
+
+        // Validation
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password required." });
+        }
+
+        // Find user
         const user = await User.findOne({ email });
-        
         if (!user) {
-            return res.status(401).json({ message: "Credenciais inválidas." });
+            return res.status(401).json({ message: "Invalid credentials." });
         }
 
+        // Check account status
         if (user.status === STATUS.PENDING) {
-            return res.status(403).json({ message: "Conta não ativada." });
+            return res.status(403).json({ message: "Account not activated. Please confirm your email." });
         }
 
+        // Verify password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: "Credenciais inválidas." });
+            return res.status(401).json({ message: "Invalid credentials." });
         }
 
+        // Generate JWT token
         const token = jwt.sign(
             { id: user._id, role: user.role },
-            'chave_secreta_pds_2026',
-            { expiresIn: '1d' }
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
         );
 
         res.status(200).json({
             token,
-            user: { name: user.name, role: user.role }
+            user: { 
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role 
+            }
         });
     } catch (error) {
-        res.status(500).json({ error });
+        console.error("Login error:", error);
+        res.status(500).json({ message: "Error during login." });
     }
 };
-authController.changePassword = async function (req, res) {
-    try {
-        // Recebe as passwords do body
-        const { oldPassword, newPassword, confirmPassword } = req.body;
-
-        // Vai buscar o utilizador autenticado pelo token JWT
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(404).json({ message: "Utilizador não encontrado." });
-        }
-
-        // Verifica se a password antiga está correcta
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Password atual incorrecta." });
-        }
-
-        // Verifica se a nova password tem mínimo 8 caracteres
-        if (newPassword.length < 8) {
-            return res.status(400).json({ message: "A nova password deve ter no mínimo 8 caracteres." });
-        }
-
-        // Verifica se a nova password coincide com a confirmação
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: "As passwords não coincidem." });
-        }
-
-        // Encripta a nova password e guarda
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
-        await user.save();
-
-        res.status(200).json({ message: "Password alterada com sucesso." });
-    } catch (error) {
-        res.status(500).json({ error });
-    }
-};
-//const jwt = require('jsonwebtoken');
-//const bcrypt = require('bcryptjs');
-const config = require('../jwt_secret/config');
-
-//var authController = {};
-
-authController.login = async function (req, res) {
-  try {
-    const user = await User.findOne({ email: req.body.email })
-    // se o utilizador não existir enviar o erro 404 - not nfound
-    if (!user) return res.status(404).send('No user found.');
-
-    // verificar se a password é válida
-    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-    if (!passwordIsValid) {
-      return res.status(401).send({ auth: false, token: null })
-    }
-
-    // se o utilizador é encontrado e a password válida -> criar um token
-    var token = jwt.sign({ id: user._id }, config.secret, {
-      expiresIn: 86400 // expires in 24 hours
-    });
-
-    // enviar a reposta com o token para o utilizador
-    res.status(200).send({ auth: true, token: token });
-
-  } catch (exception) {
-    // erro ao executar a função de login no servidor
-    console.log('Erro no login');
-    res.status(500).send('Erro no login.');
-  }
-}
-
-authController.register = async function (req, res) {
-  try {
-    const hashedPassword = bcrypt.hashSync(req.body.password, 8);
-
-    const userCreated = User.create({
-      name: req.body.name || '',
-      email: req.body.email,
-      password: hashedPassword,
-      role: req.body.email || "USER"
-    })
-
-    // Se o registo teve sucesso -> criar um token 
-    var token = jwt.sign({ id: user._id }, config.secret, {
-      expiresIn: 86400 // o token expira no fim de 24 horas
-    });
-    res.status(200).send({ auth: true, token: token });
-
-  } catch (exception) {
-    console.log('Erro ao registar utilizador na base de dados');
-    res.status(500).json(err);
-  }
-}
-
-authController.verifyToken = async function (req, res, next) {
-  try {
-    var token = req.headers['x-access-token'];
-    if (!token)
-      return res.status(403).send({ auth: false, message: 'No token provided.' });
-
-    // verifica o token e a sua validade
-    const decoded = await jwt.verify(token, config.secret)
-
-    // com a verificação completa, inclui o userId na variável req para uso em rotas autenticadas
-    req.userId = decoded.id;
-    next();
-  } catch (exception) {
-    console.log('Erro ao verificar token de autenticação');
-    res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-  }
-}
-
-authController.verifyTokenAdmin = function (req, res, next) {
-  try {
-    var token = req.headers['x-access-token'];
-    if (!token)
-      return res.status(403).send({ auth: false, message: 'No token provided.' });
-
-    // verifica o token e a sua validade
-    const decoded = jwt.verify(token, config.secret)
-    if (err || decoded.role !== 'ADMIN')
-      return
-    // com a verificação completa, inclui o userId na variável req para uso em rotas exclusivas de ADMIN
-    req.userId = decoded.id;
-    next();
-  } catch (exception) {
-    console.log('Erro ao verificar token de autenticação');
-    res.status(500).send({ auth: false, message: 'Failed to authenticate token or not Admin' });
-  }
-}
 
 module.exports = authController;

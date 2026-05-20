@@ -1,16 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var authController = require('../controllers/authController');
+var { verifyToken } = require('../middleware/authMiddleware');
 
-var authMiddleware = require('../middleware/authMiddleware');
-
+// Public routes
 router.post('/register', authController.register);
-router.get('/confirm/email', authController.confirmEmail);
 router.post('/login', authController.login);
+router.post('/confirm-email', authController.confirmEmail);
 
-router.put('/change-password', authMiddleware.verifyToken, authController.changePassword);
-
-router.post('/login' ,authController.login );
-router.post('/register', authController.register );
+// Note: Password change is handled by PUT /users/update-password
   
 module.exports = router;

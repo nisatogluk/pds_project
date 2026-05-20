@@ -1,25 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const itemRESTController = require('../controllers/itemRESTController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 
+// Create a new occurrence (requires authentication)
+router.post('/', verifyToken, itemRESTController.createOccurrence);
 
-router.post('/occurrence', authMiddleware.verifyToken, itemRESTController.createOccurrence);
-router.get('/my-occurrences', authMiddleware.verifyToken, itemRESTController.getMyOccurrences);
-router.get('/map', itemRESTController.getPublicMapOccurrences); // Mapa é público, não precisa de token
-router.get('/:id', itemRESTController.show); // Detalhes são públicos
+// Get user's occurrences (requires authentication)
+router.get('/my-occurrences', verifyToken, itemRESTController.getMyOccurrences);
 
-router.put('/:id/status', authMiddleware.verifyToken, itemRESTController.updateStatus);
-router.post('/:id/comments', authMiddleware.verifyToken, itemRESTController.addComment);
-router.delete('/:id/comments/:commentId', authMiddleware.verifyToken, itemRESTController.deleteComment);
+// Get all occurrences for map (public)
+router.get('/map', itemRESTController.getPublicMapOccurrences);
 
-//module.exports = router;
-//const authController = require('../controllers/authController');
+// Get specific occurrence details (public)
+router.get('/:id', itemRESTController.show);
 
-//router.get('/' ,itemRESTController.showAll );
-router.get('/show/:id', itemRESTController.show );
-//router.post('/create', itemRESTController.create);
-//router.put('/edit/:id', itemRESTController.edit);
-//router.delete('/delete/:id', itemRESTController.delete );
+// Update occurrence status (requires authentication)
+router.put('/:id/status', verifyToken, itemRESTController.updateStatus);
+
+// Add comment to occurrence (requires authentication)
+router.post('/:id/comments', verifyToken, itemRESTController.addComment);
+
+// Delete comment from occurrence (requires authentication)
+router.delete('/:id/comments/:commentId', verifyToken, itemRESTController.deleteComment);
+
+// Update occurrence (requires authentication + ownership validation)
+router.put('/:id', verifyToken, itemRESTController.updateOccurrence);
+
+// Delete occurrence (requires authentication + ownership validation)
+router.delete('/:id', verifyToken, itemRESTController.deleteOccurrence);
   
 module.exports = router;

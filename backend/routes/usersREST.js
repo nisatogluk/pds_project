@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { verifyToken } = require('../middleware/authMiddleware');
 
-router.put('/profile', authMiddleware.verifyToken, userController.updateUserProfile);
-router.put('/update-password', authMiddleware.verifyToken, userController.updatePassword);
+// Update profile
+router.put('/profile', verifyToken, userController.updateUserProfile);
+
+// Change password (authenticated)
+router.put('/update-password', verifyToken, userController.updatePassword);
+
+// Forgot password (public)
 router.post('/forgot-password', userController.forgotPassword);
+
+// Reset password (public)
+router.post('/reset-password', userController.resetPassword);
 
 module.exports = router;

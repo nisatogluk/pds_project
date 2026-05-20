@@ -6,10 +6,10 @@ const verifyToken = (req, res, next) => {
 
     const actualToken = token.startsWith('Bearer ') ? token.slice(7) : token;
 
-    jwt.verify(actualToken, 'chave_secreta_pds_2026', (err, decoded) => {
+    jwt.verify(actualToken, process.env.JWT_SECRET, (err, decoded) => {
         if (err) return res.status(500).json({ message: "Failed to authenticate token." });
-        req.user = decoded; // Isto guarda os dados do utilizador no pedido
-        req.userId = decoded.id; 
+        req.user = decoded;
+        req.userId = decoded.id;
         next();
     });
 };

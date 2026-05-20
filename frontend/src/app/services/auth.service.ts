@@ -1,30 +1,66 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private loginUrl = 'http://localhost:3000/api/v1/auth/login';
-  private registerUrl = 'http://localhost:3000/api/v1/auth/register';
-  private forgotPasswordUrl = 'http://localhost:3000/api/v1/auth/forgot-password';
-  private resetPasswordUrl = 'http://localhost:3000/api/v1/auth/reset-password';
+  
+  // Use environment variable or default to localhost
+  private apiUrl = 'http://localhost:3000/api/v1/auth';
+  private currentUserSubject = new BehaviorSubject<any>(this.getUserFromStorage());
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   login(credentials: any): Observable<any> {
-    return this.http.post(this.loginUrl, credentials);
+    return this.http.post(`${this.apiUrl}/login`, credentials);
   }
 
   register(user: any): Observable<any> {
-    return this.http.post(this.registerUrl, user);
+    return this.http.post(`${this.apiUrl}/register`, user);
   }
 
   forgotPassword(email: string) {
-    return this.http.post(this.forgotPasswordUrl, { email });
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
   }
 
   resetPassword(token: string, newPassword: string) {
-    return this.http.post(this.resetPasswordUrl, { token, newPassword });
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword });
+  }
+
+  changePassword(oldPassword: string, newPassword: string, confirmPassword: string) {
+    return this.http.put(`${this.apiUrl}/change-password`, { 
+      oldPassword, 
+      newPassword, 
+      confirmPassword 
+    });
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
+  }
+
+  setCurrentUser(user: any): void {
+    this.currentUserSubject.next(user);
+  }
+
+  getCurrentUser(): any {
+    return this.currentUserSubject.value;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  private getUserFromStorage(): any {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 }

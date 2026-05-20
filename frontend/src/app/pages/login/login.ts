@@ -15,6 +15,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   errorMessage: string = '';
+  isLoading: boolean = false;
 
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -29,14 +30,23 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
+      this.isLoading = true;
       const credentials = this.loginForm.value;
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          this.router.navigate(['/home']);
+          // Store token in localStorage
+          if (response.token) {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            this.authService.setCurrentUser(response.user);
+            this.router.navigate(['/home']);
+          }
+          this.isLoading = false;
         },
         error: (err) => {
-          this.errorMessage = 'Login failed. Please check your credentials.';
+          this.errorMessage = err.error?.message || 'Login failed. Please check your credentials.';
+          this.isLoading = false;
         }
       });
     }
