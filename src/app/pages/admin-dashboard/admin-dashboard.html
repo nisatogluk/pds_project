@@ -1,7 +1,14 @@
 <div class="dashboard-container">
   <header class="dashboard-header">
-    <h1>Admin Dashboard</h1>
-    <p>Occurrence Management System</p>
+    <div class="header-content">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Occurrence Management System</p>
+      </div>
+      <button routerLink="/profile" class="btn-profile">
+        Edit Profile
+      </button>
+    </div>
   </header>
 
   <div class="table-wrapper">
@@ -20,18 +27,9 @@
           <td>#001</td>
           <td>2026-05-18</td>
           <td>Infrastructure</td>
-          <td>PENDING</td>
+          <td><span class="status-pill pending">PENDING</span></td>
           <td>
             <button class="btn-update" (click)="openStatusModal('PENDING')">Update Status</button>
-          </td>
-        </tr>
-        <tr>
-          <td>#002</td>
-          <td>2026-05-19</td>
-          <td>Sanitation</td>
-          <td>UNDER_ANALYSIS</td>
-          <td>
-            <button class="btn-update" (click)="openStatusModal('UNDER_ANALYSIS')">Update Status</button>
           </td>
         </tr>
       </tbody>
