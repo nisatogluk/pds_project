@@ -1,35 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { UserService } from './user.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './profile.html',
-  styleUrl: './profile.css'
+  styleUrls: ['./profile.css']
 })
-export class ProfileComponent {
-  
-  user = {
-    name: 'Leonor Silva',
-    email: 'leonor@estgf.ipp.pt',
-    joinedDate: '2024-05-12'
-  };
+export class ProfileComponent implements OnInit {
+  profileForm: FormGroup;
+  isEditing = false;
+  showSuccess = false;
 
-  myOccurrences: any[] = [
-    { id: 1, title: 'Broken Street Light', status: 'Pending', date: '2024-05-10' },
-    { id: 2, title: 'Pothole in Rua Padre Manuel', status: 'Resolved', date: '2024-04-28' }
-  ];
+  profileImageUrl: string | null = null
 
-  constructor(private router: Router) {}
-
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
+  constructor(private fb: FormBuilder, private userService: UserService) {
+    this.profileForm = this.fb.group({
+      name: [{value: '', disabled: true}, Validators.required],
+      phone: [{value: '', disabled: true}, Validators.required],
+      address: [{value: '', disabled: true}, Validators.required],
+      email: [{value: '', disabled: true}]
+    });
   }
 
-  viewDetails(id: number) {
-    this.router.navigate(['/occurrence', id]);
+  ngOnInit() {
+    
+    const userData = this.userService.getUser();
+    this.profileForm.patchValue(userData);
+  }
+
+  toggleEdit() {
+    this.isEditing = !this.isEditing;
+    if (this.isEditing) {
+      this.profileForm.enable();
+      this.profileForm.get('email')?.disable(); // Mantemos o email bloqueado
+    } else {
+      this.profileForm.disable();
+    }
+  }
+
+  save() {
+    if (this.profileForm.valid) {
+      this.userService.updateUser(this.profileForm.getRawValue());
+      this.showSuccess = true;
+      this.toggleEdit();
+      setTimeout(() => this.showSuccess = false, 3000);
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        // Guarda o resultado para mostrar no HTML
+        this.profileImageUrl = e.target.result; 
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }

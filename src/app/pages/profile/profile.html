@@ -1,29 +1,46 @@
-<div class="profile-container">
-  <div class="user-sidebar">
-    <div class="avatar">{{ user.name.charAt(0) }}</div>
-    <h2>{{ user.name }}</h2>
-    <p class="email">{{ user.email }}</p>
-    <p class="meta">Member since: {{ user.joinedDate | date }}</p>
-    
-    <button class="logout-btn" (click)="logout()">Logout</button>
-  </div>
+<div class="profile-page">
+  <div class="profile-card">
+    <h2>My Profile</h2>
+    <div *ngIf="showSuccess" class="success-box">Dados atualizados com sucesso!</div>
 
-  <div class="activity-section">
-    <h3>My Reported Occurrences</h3>
-    
-    <div class="occurrences-grid">
-      <div class="occurrence-card" *ngFor="let item of myOccurrences" (click)="viewDetails(item.id)">
-        <div class="card-header">
-          <span class="status-badge" [ngClass]="item.status.toLowerCase()">{{ item.status }}</span>
-          <span class="date">{{ item.date | date:'shortDate' }}</span>
+    <form [formGroup]="profileForm" (ngSubmit)="save()">
+      <div class="profile-pic-container">
+        <div class="pic-wrapper" (click)="isEditing ? fileInput.click() : null" [class.editable]="isEditing">
+          
+          <img *ngIf="profileImageUrl" [src]="profileImageUrl" class="profile-img">
+          
+          <div *ngIf="!profileImageUrl" class="pic-placeholder">👤</div>
+
+          <div class="pic-overlay" *ngIf="isEditing">
+            <span>Edit</span>
+          </div>
         </div>
-        <h4>{{ item.title }}</h4>
-        <p>Click to view details →</p>
+        
+        <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+      </div>
+      <div class="input-group">
+        <label>Name</label>
+        <input formControlName="name">
+      </div>
+      <div class="input-group">
+        <label>Mobile Number</label>
+        <input formControlName="phone">
+      </div>
+      <div class="input-group">
+        <label>Address</label>
+        <input formControlName="address">
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input formControlName="email" class="disabled">
       </div>
 
-      <div class="empty-state" *ngIf="myOccurrences.length === 0">
-        <p>You haven't reported any occurrences yet.</p>
+      <div class="actions">
+        <button type="button" class="edit-btn" (click)="toggleEdit()">
+          {{ isEditing ? 'Cancel' : 'Edit' }}
+        </button>
+        <button type="submit" *ngIf="isEditing" class="save-btn">Save Changes</button>
       </div>
-    </div>
+    </form>
   </div>
 </div>
