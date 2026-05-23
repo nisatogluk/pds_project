@@ -1,0 +1,184 @@
+<div class="container">
+
+    <!-- LOADING -->
+
+    <div *ngIf="loading" class="loader-container">
+
+        <div class="loader"></div>
+        <p>Loading details...</p>
+
+    </div>
+
+    <!-- DETAIL CARD -->
+
+    <div *ngIf="!loading && occurrence" class="detail-card">
+
+        <!-- IMAGE -->
+
+        <div class="image-container">
+
+            <img [src]="occurrence.photoUrl || 'assets/no-image.png'">
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <span class="category-badge">
+
+                {{ occurrence.category || 'Incident' }}
+
+            </span>
+
+            <h1>{{ occurrence.title }}</h1>
+
+            <p class="description">
+
+                {{ occurrence.description }}
+
+            </p>
+
+            <div class="info-row">
+
+                <span class="info-label">📍 Location</span>
+
+                <span class="info-value">
+
+                    {{ occurrence.location }}
+
+                </span>
+
+            </div>
+
+            <div class="info-row">
+
+                <span class="info-label">🚦 Status</span>
+
+                <span
+                    class="status"
+                    [ngClass]="'status-' + occurrence.status"
+                >
+
+                    {{ occurrence.status }}
+
+                </span>
+
+            </div>
+
+            <div class="info-row">
+
+                <span class="info-label">📅 Date</span>
+
+                <span class="info-value">
+
+                    {{ formatDate(occurrence.createdAt) }}
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- COMMENTS -->
+
+        <div class="comments-section">
+
+            <h3>
+
+                💬 Comments
+                ({{ occurrence.comments?.length || 0 }})
+
+            </h3>
+
+            <!-- NO COMMENTS -->
+
+            <div
+                *ngIf="!occurrence.comments?.length"
+                class="no-comments"
+            >
+
+                No comments yet.
+
+            </div>
+
+            <!-- COMMENT LIST -->
+
+            <div
+                *ngFor="let comment of occurrence.comments"
+                class="comment-card"
+            >
+
+                <p class="comment-text">
+
+                    {{ comment.text }}
+
+                </p>
+
+                <div class="comment-meta">
+
+                    <span>
+
+                        👤 {{ getCommentLabel(comment) }}
+
+                    </span>
+                     <span>   </span>
+                    <span>
+
+                        {{ formatDate(comment.createdAt) }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- COMMENT FORM -->
+
+            <div
+                *ngIf="isAuthenticated()"
+                class="comment-form" >
+
+                <textarea
+
+                    [(ngModel)]="newComment"
+
+                    placeholder="Write a comment..."
+
+                ></textarea>
+
+                <button (click)="postComment()">
+
+                    Post
+
+                </button>
+
+            </div>
+
+            <!-- NOT LOGGED -->
+
+            <div
+                *ngIf="!isAuthenticated()"
+                class="login-warning"
+            >
+
+                Login to comment
+
+            </div>
+
+        </div>
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            <a href="/home" class="back-btn">
+
+                ← Return to Map
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

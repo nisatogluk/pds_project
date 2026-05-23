@@ -1,0 +1,45 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Occurrence Management System</p>
+      </div>
+      <button routerLink="/profile" class="btn-profile">
+        Edit Profile
+      </button>
+    </div>
+  </header>
+
+  <div class="table-wrapper">
+    <table class="occurrence-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Report Date</th>
+          <th>Category</th>
+          <th>Current Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>#001</td>
+          <td>2026-05-18</td>
+          <td>Infrastructure</td>
+          <td><span class="status-pill pending">PENDING</span></td>
+          <td>
+            <button class="btn-update" (click)="openStatusModal('PENDING')">Update Status</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-status-update-modal 
+  [isOpen]="isModalOpen" 
+  [currentStatus]="selectedOccurrenceStatus"
+  (close)="closeStatusModal()"
+  (save)="handleStatusUpdate($event)">
+</app-status-update-modal>

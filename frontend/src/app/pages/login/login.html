@@ -1,0 +1,49 @@
+<div class="auth-container">
+  <div class="auth-split-left">
+    <div class="overlay-content">
+      <h2>Welcome back to the community</h2>
+      <p>Log in to explore and report occurrences</p>
+    </div>
+  </div>
+
+  <div class="auth-split-right">
+    <div class="form-container">
+      <h1>Log in to your account!</h1>
+      
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="field-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" placeholder="student@estgf.ipp.pt">
+          <div class="error-text" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required.</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Invalid email format.</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" placeholder="Password">
+          <div class="error-text" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</span>
+          </div>
+        </div>
+
+        <div class="forgot-pass">
+          <a routerLink="/forgot-password">Forgot password?</a>
+        </div>
+
+        <div class="server-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <button type="submit" class="auth-btn" [disabled]="loginForm.invalid">
+          Continue
+        </button>
+      </form>
+
+      <p class="switch-auth">
+        Don't have an account? <a routerLink="/register">Sign up</a>
+      </p>
+    </div>
+  </div>
+</div>

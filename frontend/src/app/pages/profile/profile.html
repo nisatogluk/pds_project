@@ -1,0 +1,53 @@
+<div class="profile-page">
+  <div class="profile-card">
+    <h2>My Profile</h2>
+    <div *ngIf="showSuccess" class="success-box">Dados atualizados com sucesso!</div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="save()">
+      <div class="profile-pic-container">
+        <div class="pic-wrapper" (click)="isEditing ? fileInput.click() : null" [class.editable]="isEditing">
+          
+          <img *ngIf="profileImageUrl" [src]="profileImageUrl" class="profile-img">
+          
+          <div *ngIf="!profileImageUrl" class="pic-placeholder">👤</div>
+
+          <div class="pic-overlay" *ngIf="isEditing">
+            <span>Edit</span>
+          </div>
+        </div>
+        
+        <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+      </div>
+      <div class="input-group">
+        <label>Name</label>
+        <input formControlName="name">
+      </div>
+      <div class="input-group">
+        <label>Mobile Number</label>
+        <input formControlName="phone">
+      </div>
+      <div class="input-group">
+        <label>Address</label>
+        <input formControlName="address">
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input formControlName="email" class="disabled">
+      </div>
+
+      <div class="actions">
+  <button type="button" class="edit-btn" (click)="toggleEdit()">
+    {{ isEditing ? 'Cancel' : 'Edit' }}
+  </button>
+
+  <button type="button" class="password-btn" routerLink="/change-password" *ngIf="!isEditing">
+    Change Password
+  </button>
+
+  <button type="submit" class="save-btn" *ngIf="isEditing">
+    Save Changes
+  </button>
+</div>
+    </form>
+  </div>
+</div>
