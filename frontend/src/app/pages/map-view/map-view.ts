@@ -23,7 +23,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
-    this.http.get<any[]>('http://localhost:3000/api/v1/occurrences/map')
+    this.http.get<any[]>('http://localhost:3001/api/v1/occurrences/map')
       .subscribe({
         next: (data) => {
           this.loading = false;
@@ -37,7 +37,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
                 <b style="color: #1e1b4b;">${occ.title}</b><br>
                 <span style="padding: 2px 6px; background: #e0e7ff; border-radius: 4px; font-size: 10px;">${occ.status}</span><br>
                 <img src="${occ.photoUrl}" style="width:120px; height:80px; object-fit:cover; border-radius:6px; margin:8px 0;"><br>
-                <a href="/occurrence/${occ._id}" style="color:#4338ca; text-decoration:none; font-weight:bold; font-size: 13px;">
+                <a href="/this-occurrence/${occ._id}" style="color:#4338ca; text-decoration:none; font-weight:bold; font-size: 13px;">
                   View Details →
                 </a>
               </div>
@@ -49,7 +49,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
           });
         },
         error: (err) => {
-          console.error("Harita verisi çekilemedi:", err);
+          console.error("Map can not load:", err);
           this.loading = false;
         }
       });
