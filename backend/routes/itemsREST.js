@@ -29,5 +29,8 @@ router.put('/:id', verifyToken, itemRESTController.updateOccurrence);
 
 // Delete occurrence (requires authentication + ownership validation)
 router.delete('/:id', verifyToken, itemRESTController.deleteOccurrence);
+
+// Get all occurrences (admin only)
+router.get('/', verifyToken, isAdmin, itemRESTController.getAllOccurrences);
   
 module.exports = router;

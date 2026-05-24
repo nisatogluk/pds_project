@@ -1,0 +1,31 @@
+const STATUS = {
+    // User statuses
+    PENDING: 'PENDING',
+    ACTIVE: 'ACTIVE',
+    DISABLED: 'DISABLED',
+    SUSPENDED: 'SUSPENDED',
+    DELETED: 'DELETED'
+};
+
+// Occurrence statuses
+const OCCURRENCE_STATUS = {
+    PENDING: 'PENDING',
+    UNDER_ANALYSIS: 'UNDER_ANALYSIS',
+    IN_RESOLUTION: 'IN_RESOLUTION',
+    APPROVED: 'APPROVED',
+    REJECTED: 'REJECTED',
+    SOLVED: 'SOLVED'
+};
+
+// Notification types
+const NOTIFICATION_TYPES = {
+    STATUS_UPDATE: 'STATUS_UPDATE',
+    NEW_COMMENT: 'NEW_COMMENT',
+    NEW_OCCURRENCE: 'NEW_OCCURRENCE'
+};
+
+module.exports = {
+    STATUS,
+    OCCURRENCE_STATUS,
+    NOTIFICATION_TYPES
+};

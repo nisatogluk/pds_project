@@ -1,14 +1,9 @@
+const ROLES = require('./roles');
+const { STATUS, OCCURRENCE_STATUS, NOTIFICATION_TYPES } = require('./statuses');
+
 module.exports = {
-    STATUS: {
-        PENDING: 'PENDING',
-        ACTIVE: 'ACTIVE',
-        DISABLED: 'DISABLED',
-        SUSPENDED: 'SUSPENDED',
-        DELETED: 'DELETED'
-    },
-    ROLES: {
-        CONTRIBUTOR: 'Contributor',
-        ADMIN: 'Admin',
-        MODERATOR: 'Moderator'
-    }
+    ROLES,
+    STATUS,
+    OCCURRENCE_STATUS,
+    NOTIFICATION_TYPES
 };

@@ -27,12 +27,10 @@ itemRESTController.createOccurrence = async function (req, res, next) {
         const { title, description, category, location, latitude, longitude, photoUrl } = req.body;
         const currentUserId = req.user ? (req.user.id || req.user._id) : null;
 
-        // Validate user is authenticated
         if (!currentUserId) {
             return res.status(401).json({ message: "Token is missing or invalid." });
         }
 
-        // Validate input
         const validationErrors = validateOccurrenceInput({ title, description, category, latitude, longitude });
         if (validationErrors.length > 0) {
             return res.status(400).json({ message: "Validation failed", errors: validationErrors });
@@ -64,6 +62,17 @@ itemRESTController.createOccurrence = async function (req, res, next) {
     } catch (error) {
         console.error("Create occurrence error:", error);
         res.status(500).json({ message: "Error creating occurrence" });
+    }
+};
+
+// Get All Occurrences (admin only)
+itemRESTController.getAllOccurrences = async function(req, res) {
+    try {
+        const occurrences = await Occurrence.find().sort({ createdAt: -1 });
+        res.json(occurrences);
+    } catch (error) {
+        console.error("Get all occurrences error:", error);
+        res.status(500).json({ message: "Error fetching occurrences" });
     }
 };
 
@@ -125,18 +134,15 @@ itemRESTController.updateOccurrence = async function(req, res) {
             return res.status(404).json({ message: "Occurrence not found." });
         }
 
-        // Check if user is the owner
         if (String(occurrence.userId) !== String(userId)) {
             return res.status(403).json({ message: "Only the occurrence owner can update it." });
         }
 
-        // Validate input
         const validationErrors = validateOccurrenceInput(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ message: "Validation failed", errors: validationErrors });
         }
 
-        // Update fields
         occurrence.title = req.body.title?.trim() || occurrence.title;
         occurrence.description = req.body.description?.trim() || occurrence.description;
         occurrence.category = req.body.category?.trim() || occurrence.category;
@@ -153,7 +159,7 @@ itemRESTController.updateOccurrence = async function(req, res) {
     }
 };
 
-// Update status (admin or moderator only)
+// Update status (admin only)
 itemRESTController.updateStatus = async function(req, res) {
     try {
         const { status } = req.body;
@@ -161,22 +167,18 @@ itemRESTController.updateStatus = async function(req, res) {
         const userRole = req.user ? req.user.role : null;
         const validStatuses = ['PENDING', 'UNDER_ANALYSIS', 'APPROVED', 'IN_RESOLUTION', 'SOLVED', 'REJECTED'];
 
-        // Validate user is authenticated
         if (!userId) {
             return res.status(401).json({ message: "User not authenticated." });
         }
 
-        // Validate user has permission to change status
-        if (userRole !== 'Admin' && userRole !== 'Moderator') {
-            return res.status(403).json({ message: "Only admin or moderator can change occurrence status." });
+        if (userRole !== 'Admin') {
+            return res.status(403).json({ message: "Only admin can change occurrence status." });
         }
 
-        // Validate status
         if (!status || !validStatuses.includes(status)) {
             return res.status(400).json({ message: `Invalid status. Valid options: ${validStatuses.join(', ')}` });
         }
 
-        // Find and update occurrence
         const updatedOccurrence = await Occurrence.findByIdAndUpdate(
             req.params.id,
             { status },
@@ -187,7 +189,6 @@ itemRESTController.updateStatus = async function(req, res) {
             return res.status(404).json({ message: "Occurrence not found." });
         }
 
-        // Create notification
         const statusNotification = new Notification({
             userId: updatedOccurrence.userId,
             occurrenceId: updatedOccurrence._id,
@@ -196,7 +197,6 @@ itemRESTController.updateStatus = async function(req, res) {
         });
         await statusNotification.save();
 
-        // Send email notification to occurrence owner
         try {
             const occurrenceOwner = await User.findById(updatedOccurrence.userId);
             if (occurrenceOwner && occurrenceOwner.email) {
@@ -208,7 +208,6 @@ itemRESTController.updateStatus = async function(req, res) {
             }
         } catch (emailError) {
             console.error("Failed to send status update email:", emailError);
-            // Don't fail the request if email fails
         }
 
         res.status(200).json(updatedOccurrence);
@@ -233,7 +232,6 @@ itemRESTController.deleteOccurrence = async function(req, res) {
             return res.status(404).json({ message: "Occurrence not found." });
         }
 
-        // Check if user is the owner
         if (String(occurrence.userId) !== String(userId)) {
             return res.status(403).json({ message: "Only the occurrence owner can delete it." });
         }
@@ -274,18 +272,15 @@ itemRESTController.addComment = async function(req, res) {
         const ownerId = String(occurrence.userId || "");
         const currentUserId = String(req.user?.id || req.user?._id || "");
 
-        // Only notify the owner if the commenter is a different person
         if (ownerId !== currentUserId && ownerId !== "") {
-            // Create notification in database
             const notification = new Notification({
                 userId: occurrence.userId,
                 occurrenceId: occurrence._id,
                 message: `New comment on your occurrence: "${occurrence.title}"`,
-                type: "NEW_COMMENT" 
+                type: "NEW_COMMENT"
             });
             await notification.save();
 
-            // Send email notification
             try {
                 const occurrenceOwner = await User.findById(occurrence.userId);
                 if (occurrenceOwner && occurrenceOwner.email) {
@@ -297,7 +292,6 @@ itemRESTController.addComment = async function(req, res) {
                 }
             } catch (emailError) {
                 console.error("Failed to send comment notification email:", emailError);
-                // Don't fail the request if email fails
             }
         }
 
@@ -328,7 +322,6 @@ itemRESTController.deleteComment = async function(req, res) {
             return res.status(404).json({ message: "Comment not found." });
         }
 
-        // Check if user is the comment author or occurrence owner
         if (String(comment.authorId) !== String(userId) && String(occurrence.userId) !== String(userId)) {
             return res.status(403).json({ message: "You cannot delete this comment." });
         }
