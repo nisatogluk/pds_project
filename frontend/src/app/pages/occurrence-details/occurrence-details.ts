@@ -7,23 +7,31 @@ import { DataService } from '../../services/data';
 @Component({
   selector: 'app-occurrence-details',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './occurrence-details.html',
   styleUrls: ['./occurrence-details.css']
 })
 export class OccurrenceDetailsComponent implements OnInit {
+
   private route = inject(ActivatedRoute);
   private dataService = inject(DataService);
   private cdr = inject(ChangeDetectorRef);
 
   occurrence: any = null;
   loading = true;
+
   newComment = '';
 
   currentUserId = '';
   currentUserName = '';
 
+  isLoggedIn = false;
+
   ngOnInit(): void {
+
+    // AUTH CHECK
+    this.isLoggedIn = !!localStorage.getItem('token');
+
     // USER INFO
     this.currentUserId =
       localStorage.getItem('userId') ||
@@ -37,29 +45,66 @@ export class OccurrenceDetailsComponent implements OnInit {
       'You';
 
     const id = this.route.snapshot.paramMap.get('id');
-    if (!id) return;
+
+    if (!id) {
+      this.loading = false;
+      return;
+    }
 
     this.loadOccurrenceDetails(id);
   }
-// Details loading and normalization function (Called both at first startup and after comment)
-  private loadOccurrenceDetails(id: string) {
+
+  // LOAD DETAILS
+  private loadOccurrenceDetails(id: string): void {
+
     this.dataService.getOccurrenceById(id).subscribe({
+
       next: (data: any) => {
+
         this.occurrence = data || {};
 
+        // COMMENTS ARRAY SAFETY
         if (!this.occurrence.comments) {
           this.occurrence.comments = [];
         }
 
-        // Normalize comments to ensure fields always exist
-        this.occurrence.comments = (this.occurrence.comments || []).map((c: any) => ({
-          text: c?.text || c?.body || '',
-          userId: c?.userId || c?.user_id || c?.authorId || c?.user?._id || 'unknown',
-          userName: c?.userName || c?.username || c?.name || c?.user?.username || null,
-          createdAt: c?.createdAt || c?.created_at || new Date().toISOString()
-        }));
+        // COMMENT NORMALIZATION to ensure fields always exist
+        this.occurrence.comments = this.occurrence.comments.map((c: any) => ({
 
-        // Ensure occurrence has userId (owner) normalized
+          text:
+            c?.text ||
+            c?.body ||
+            '',
+
+          userId:
+            c?.userId ||
+            c?.user_id ||
+            c?.authorId ||
+            c?.user?._id ||
+            'unknown',
+
+          userName:
+            c?.userName ||
+            c?.username ||
+            c?.name ||
+            c?.user?.username ||
+            null,
+
+          createdAt:
+            c?.createdAt ||
+            c?.created_at ||
+            new Date().toISOString()
+
+        }));
+        // ---  (CONSTRAINTS: OLDEST FIRST) ---
+
+        this.occurrence.comments.sort((a: any, b: any) => {
+
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+
+        });
+
+        // OCCURRENCE OWNER NORMALIZATION Ensure occurrence has userId (owner) normalized
         this.occurrence.userId =
           this.occurrence.userId ||
           this.occurrence.user_id ||
@@ -69,79 +114,102 @@ export class OccurrenceDetailsComponent implements OnInit {
           null;
 
         this.loading = false;
+
         this.cdr.detectChanges();
       },
-      error: () => {
+
+      error: (err) => {
+
+        console.error('Occurrence loading error:', err);
+
         this.loading = false;
+
         this.cdr.detectChanges();
       }
     });
   }
 
   formatDate(date: string): string {
+
     if (!date) return '---';
+
     try {
       return new Date(date).toLocaleDateString();
-    } catch {
+    }
+    catch {
       return '---';
     }
   }
 
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
-  }
-
-  // Comment label logic:
+  // COMMENT LABEL
   // - If comment.userId === occurrence.userId -> OWNER
   // - Else -> User #shortId
   getCommentLabel(comment: any): string {
+
     const userId = comment?.userId || 'unknown';
-    const userName = comment?.userName || 'User';
 
-    // OWNER (post/report ) - OWNER should be shown regardless of viewer
-    if (this.occurrence?.userId && userId === this.occurrence.userId) {
-      const ownerLabel = userName && userName !== 'You' ? userName : `User #${this.shortId(userId)}`;
-      return `Owner (${ownerLabel})`;
+    // OWNER
+    if (
+      this.occurrence?.userId &&
+      userId === this.occurrence.userId
+    ) {
+      return `Owner (User #${this.shortId(userId)})`;
     }
 
-    // YOU (current logged user)
-    if (userId && userId === this.currentUserId) {
-      return `${userName} (You)`;
-    }
-
-    // Other users
+    // OTHER USERS
     return `User #${this.shortId(userId)}`;
   }
 
   private shortId(id: string): string {
+
     if (!id) return 'unknown';
-    return id.length > 5 ? id.slice(0, 5) : id;
+
+    return id.length > 5
+      ? id.slice(0, 5)
+      : id;
   }
 
   // POST COMMENT
-  postComment() {
-    // 1. Secury
-    if (!this.isAuthenticated()) {
-      console.warn('You need to log in to make comment.');
+  postComment(): void {
+
+    // SECURITY
+    if (!this.isLoggedIn) {
+
+      console.warn('You need to login first to make comment.');
+
       return;
     }
 
-    // 2. EMPTY COMMENT CONTROL
-    if (!this.newComment || !this.newComment.trim()) return;
+    // EMPTY COMMENT CONTROL
+    if (!this.newComment.trim()) return;
+
+    const occurrenceId = this.occurrence?._id;
+
+    // NULL SAFETY
+    if (!occurrenceId) {
+
+      console.error('Occurrence ID not found.');
+
+      return;
+    }
 
     const text = this.newComment.trim();
-    const occurrenceId = this.occurrence._id;
 
-    this.dataService.addComment(occurrenceId, text)
+    this.dataService
+      .addComment(occurrenceId, text)
       .subscribe({
-        next: (res: any) => {
-          this.newComment = ''; 
-        
-          // EXACT SOLUTION: After adding the comment, we re-retrieve the data from the backend in the background.
-          // Thus, all IDs and the Owner label are in place with zero errors, as if the page was refreshed.
+
+        next: () => {
+
+          // CLEAR INPUT
+          this.newComment = '';
+
+          // LIVE REFRESH
           this.loadOccurrenceDetails(occurrenceId);
         },
+
         error: (err) => {
+
           console.error('Comment error:', err);
         }
       });

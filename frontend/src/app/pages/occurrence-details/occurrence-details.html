@@ -5,6 +5,7 @@
     <div *ngIf="loading" class="loader-container">
 
         <div class="loader"></div>
+
         <p>Loading details...</p>
 
     </div>
@@ -17,7 +18,7 @@
 
         <div class="image-container">
 
-            <img [src]="occurrence.photoUrl || 'assets/no-image.png'">
+            <img [src]="occurrence.photoUrl || 'assets/no-image.png'" alt="Occurrence image">
 
         </div>
 
@@ -31,7 +32,11 @@
 
             </span>
 
-            <h1>{{ occurrence.title }}</h1>
+            <h1>
+
+                {{ occurrence.title }}
+
+            </h1>
 
             <p class="description">
 
@@ -39,9 +44,15 @@
 
             </p>
 
+            <!-- LOCATION -->
+
             <div class="info-row">
 
-                <span class="info-label">📍 Location</span>
+                <span class="info-label">
+
+                    📍 Location
+
+                </span>
 
                 <span class="info-value">
 
@@ -51,14 +62,35 @@
 
             </div>
 
+            <!-- USER -->
+
             <div class="info-row">
 
-                <span class="info-label">🚦 Status</span>
+                <span class="info-label">
 
-                <span
-                    class="status"
-                    [ngClass]="'status-' + occurrence.status"
-                >
+                    👤 User Reference
+
+                </span>
+
+                <span class="info-value">
+
+                    {{ occurrence.userId }}
+
+                </span>
+
+            </div>
+
+            <!-- STATUS -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+
+                    🚦 Status
+
+                </span>
+
+                <span class="status" [ngClass]="'status-' + occurrence.status">
 
                     {{ occurrence.status }}
 
@@ -66,9 +98,15 @@
 
             </div>
 
+            <!-- DATE -->
+
             <div class="info-row">
 
-                <span class="info-label">📅 Date</span>
+                <span class="info-label">
+
+                    📅 Date
+
+                </span>
 
                 <span class="info-value">
 
@@ -93,10 +131,7 @@
 
             <!-- NO COMMENTS -->
 
-            <div
-                *ngIf="!occurrence.comments?.length"
-                class="no-comments"
-            >
+            <div *ngIf="!occurrence.comments?.length" class="no-comments">
 
                 No comments yet.
 
@@ -104,30 +139,31 @@
 
             <!-- COMMENT LIST -->
 
-            <div
-                *ngFor="let comment of occurrence.comments"
-                class="comment-card"
-            >
+            <div class="comment-list">
 
-                <p class="comment-text">
+                <div *ngFor="let comment of occurrence.comments" class="comment-card">
 
-                    {{ comment.text }}
+                    <p class="comment-text">
 
-                </p>
+                        {{ comment.text }}
 
-                <div class="comment-meta">
+                    </p>
 
-                    <span>
+                    <div class="comment-meta">
 
-                        👤 {{ getCommentLabel(comment) }}
+                        <span>
 
-                    </span>
-                     <span>   </span>
-                    <span>
+                            👤 {{ getCommentLabel(comment) }}
 
-                        {{ formatDate(comment.createdAt) }}
+                        </span>
 
-                    </span>
+                        <span>
+
+                            {{ formatDate(comment.createdAt) }}
+
+                        </span>
+
+                    </div>
 
                 </div>
 
@@ -135,19 +171,11 @@
 
             <!-- COMMENT FORM -->
 
-            <div
-                *ngIf="isAuthenticated()"
-                class="comment-form" >
+            <div *ngIf="isLoggedIn" class="comment-form">
 
-                <textarea
+                <textarea [(ngModel)]="newComment" placeholder="Write a comment..."></textarea>
 
-                    [(ngModel)]="newComment"
-
-                    placeholder="Write a comment..."
-
-                ></textarea>
-
-                <button (click)="postComment()">
+                <button (click)="postComment()" [disabled]="!newComment.trim()">
 
                     Post
 
@@ -155,23 +183,21 @@
 
             </div>
 
-            <!-- NOT LOGGED -->
+            <!-- LOGIN WARNING -->
 
-            <div
-                *ngIf="!isAuthenticated()"
-                class="login-warning"
-            >
+            <div *ngIf="!isLoggedIn" class="login-warning">
 
-                Login to comment
+                <b>Login to comment</b>
 
             </div>
 
         </div>
+
         <!-- FOOTER -->
 
         <div class="footer">
 
-            <a href="/home" class="back-btn">
+            <a routerLink="/home" class="back-btn">
 
                 ← Return to Map
 
