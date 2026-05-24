@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+imports: [RouterOutlet, NavbarComponent, CommonModule]
 
 describe('App', () => {
   beforeEach(async () => {

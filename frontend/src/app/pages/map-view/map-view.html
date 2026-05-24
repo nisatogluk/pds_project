@@ -1,10 +1,12 @@
 <div id="map"></div>
 
 <div class="floating-buttons">
-  <button routerLink="/report">➕ Report</button>
-  <button routerLink="/my-listoccurrences">📋 My Occurrences</button>
+  <button [hidden]="isAdmin()" routerLink="/report">➕ Report</button>
+  <button [hidden]="isAdmin()" routerLink="/my-listoccurrences">📋 My Occurrences</button>
   <button routerLink="/profile" class="menu-button">
     <span class="icon">👤</span> My Profile
   </button>
+  <button [hidden]="!isAdmin()" routerLink="/admin-dashboard" class="menu-button">
+    <span class="icon">⚙️</span> Admin Dashboard
+  </button>
 </div>
-

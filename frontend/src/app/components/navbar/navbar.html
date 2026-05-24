@@ -1,6 +1,20 @@
 <nav>
-  <a routerLink="/login">Login</a>
-  <a routerLink="/report-form">Mapa (Nisa)</a>
-  <a routerLink="/my-occurrences">Minhas Ocorrências</a>
-  <a routerLink="/profile">Meu Perfil</a>
+  <ng-container *ngIf="!isAuthenticated()">
+    <a routerLink="/login">Login</a>
+    <a routerLink="/register">Register</a>
+  </ng-container>
+
+  <ng-container *ngIf="isAuthenticated()">
+    <a routerLink="/home">Map</a>
+    <a routerLink="/report-form">Report</a>
+    <a routerLink="/my-occurrences">My Occurrences</a>
+    <a routerLink="/profile">My Profile</a>
+    <a routerLink="/change-password">Change Password</a>
+
+    <ng-container *ngIf="isAdmin()">
+      <a routerLink="/admin-dashboard">Admin Dashboard</a>
+    </ng-container>
+
+    <a routerLink="/login" (click)="logout()">Logout</a>
+  </ng-container>
 </nav>

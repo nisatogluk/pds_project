@@ -1,20 +1,43 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { OccurrenceService } from '../../services/occurrence.service';
 import { StatusUpdateModalComponent } from '../../components/status-update-modal/status-update-modal';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, StatusUpdateModalComponent],
+  imports: [CommonModule, HttpClientModule, StatusUpdateModalComponent],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
+  private occurrenceService = inject(OccurrenceService);
+  private cdr = inject(ChangeDetectorRef);
+
+  occurrences: any[] = [];
   isModalOpen = false;
+  selectedOccurrenceId = '';
   selectedOccurrenceStatus = 'PENDING';
 
-  openStatusModal(status: string) {
-    this.selectedOccurrenceStatus = status;
+  ngOnInit(): void {
+    this.loadOccurrences();
+  }
+
+  loadOccurrences(): void {
+    this.occurrenceService.getAllOccurrences().subscribe({
+      next: (data) => {
+        console.log('Occurrences:', data);
+        this.occurrences = [...data];
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading occurrences:', err)
+    });
+  }
+
+  openStatusModal(occurrence: any) {
+    this.selectedOccurrenceId = occurrence._id;
+    this.selectedOccurrenceStatus = occurrence.status;
     this.isModalOpen = true;
   }
 
@@ -23,6 +46,12 @@ export class AdminDashboardComponent {
   }
 
   handleStatusUpdate(newStatus: string) {
-    console.log('New stateOccurrence value:', newStatus);
+    this.occurrenceService.updateStatus(this.selectedOccurrenceId, newStatus).subscribe({
+      next: () => {
+        this.loadOccurrences();
+        this.closeStatusModal();
+      },
+      error: (err) => console.error('Error updating status:', err)
+    });
   }
 }
