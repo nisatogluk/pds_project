@@ -19,6 +19,28 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
 
+ private redIcon = L.divIcon({
+    className: '',
+    html: `<div style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    ">
+      <div style="
+        width: 24px;
+        height: 24px;
+        background: radial-gradient(circle at 35% 35%, #ff6666, #cc0000);
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        border: 2px solid #990000;
+      "></div>
+    </div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -24]
+  });
+
   ngOnInit(): void {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -59,7 +81,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
               </div>
             `;
 
-            L.marker([occ.latitude, occ.longitude])
+            L.marker([occ.latitude, occ.longitude], { icon: this.redIcon })
               .addTo(this.map)
               .bindPopup(popupContent);
           });
