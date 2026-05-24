@@ -1,6 +1,6 @@
 <div class="navbar">
-    <a routerLink="/map-view" class="nav-link">🏠 Map</a>
-    <a routerLink="/report-form" class="nav-link">➕ Report New Incident</a>
+    <a routerLink="/home" class="nav-link">🏠 Map</a>
+    <a routerLink="/report" class="nav-link">➕ Report New Incident</a>
 </div>
 
 <div class="container">
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <a [routerLink]="['/occurrence', occ._id]" class="view-btn">
+            <a [routerLink]="['/this-occurrence', occ._id]" class="view-btn">
                 Details
             </a>
         </div>

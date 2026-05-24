@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:3000/api/v1/occurrences';
+  private baseUrl = 'http://localhost:3001/api/v1/occurrences';
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');

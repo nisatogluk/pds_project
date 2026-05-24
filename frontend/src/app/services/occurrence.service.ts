@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class OccurrenceService {
   private http = inject(HttpClient);
-  private occurrenceUrl = 'http://localhost:3000/api/v1/occurrences';
+  private occurrenceUrl = 'http://localhost:3001/api/v1/occurrences';
 
   getAllOccurrences(): Observable<any> {
     return this.http.get(this.occurrenceUrl);
