@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -8,7 +8,6 @@ import { Observable, BehaviorSubject } from 'rxjs';
 export class AuthService {
   private http = inject(HttpClient);
   
-  // Use environment variable or default to localhost
   private apiUrl = 'http://localhost:3001/api/v1/auth';
   private currentUserSubject = new BehaviorSubject<any>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -29,12 +28,13 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword });
   }
 
-  changePassword(oldPassword: string, newPassword: string, confirmPassword: string) {
-    return this.http.put(`${this.apiUrl}/change-password`, { 
-      oldPassword, 
-      newPassword, 
-      confirmPassword 
-    });
+  changePassword(oldPassword: string, newPassword: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.put('http://localhost:3001/api/v1/users/update-password', 
+      { oldPassword, newPassword },
+      { headers }
+    );
   }
 
   logout(): void {
