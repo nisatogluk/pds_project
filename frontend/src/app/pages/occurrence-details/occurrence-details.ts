@@ -7,7 +7,7 @@ import { DataService } from '../../services/data';
 @Component({
   selector: 'app-occurrence-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './occurrence-details.html',
   styleUrls: ['./occurrence-details.css']
 })

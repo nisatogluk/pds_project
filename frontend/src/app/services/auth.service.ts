@@ -9,7 +9,7 @@ export class AuthService {
   private http = inject(HttpClient);
   
   // Use environment variable or default to localhost
-  private apiUrl = 'http://localhost:3000/api/v1/auth';
+  private apiUrl = 'http://localhost:3001/api/v1/auth';
   private currentUserSubject = new BehaviorSubject<any>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
 
