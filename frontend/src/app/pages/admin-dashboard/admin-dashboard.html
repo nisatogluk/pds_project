@@ -5,9 +5,6 @@
         <h1>Admin Dashboard</h1>
         <p>Occurrence Management System</p>
       </div>
-      <button routerLink="/profile" class="btn-profile">
-        Edit Profile
-      </button>
     </div>
   </header>
 
@@ -16,20 +13,20 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Report Date</th>
+          <th>Title</th>
           <th>Category</th>
           <th>Current Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>#001</td>
-          <td>2026-05-18</td>
-          <td>Infrastructure</td>
-          <td><span class="status-pill pending">PENDING</span></td>
+        <tr *ngFor="let occurrence of occurrences">
+          <td>{{ occurrence._id | slice:0:6 }}</td>
+          <td>{{ occurrence.title }}</td>
+          <td>{{ occurrence.category }}</td>
+          <td><span class="status-pill" [ngClass]="occurrence.status.toLowerCase()">{{ occurrence.status }}</span></td>
           <td>
-            <button class="btn-update" (click)="openStatusModal('PENDING')">Update Status</button>
+            <button class="btn-update" (click)="openStatusModal(occurrence)">Update Status</button>
           </td>
         </tr>
       </tbody>

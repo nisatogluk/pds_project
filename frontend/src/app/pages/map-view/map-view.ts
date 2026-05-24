@@ -1,8 +1,9 @@
-import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit, inject } from '@angular/core';
 import * as L from 'leaflet';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-map-view',
@@ -11,13 +12,28 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   templateUrl: './map-view.html',
   styleUrls: ['./map-view.css']
 })
-export class MapViewComponent implements AfterViewInit, OnDestroy {
+export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = true;
+  currentUser: any = null;
   private map!: L.Map;
-  private http = inject(HttpClient); // HttpClient
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+
+  ngOnInit(): void {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      this.currentUser = JSON.parse(storedUser);
+    }
+    this.authService.currentUser$.subscribe(user => {
+      if (user) this.currentUser = user;
+    });
+  }
+
+  isAdmin(): boolean {
+    return this.currentUser?.role === 'Admin';
+  }
 
   ngAfterViewInit(): void {
-    // Start Map
     this.map = L.map('map').setView([41.15, -8.61], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'

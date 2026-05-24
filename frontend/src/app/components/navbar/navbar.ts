@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,4 +14,32 @@ import { CommonModule } from '@angular/common';
     a:hover { background: #555; }
   `]
 })
-export class NavbarComponent {}
+export class NavbarComponent implements OnInit {
+  private authService = inject(AuthService);
+  currentUser: any = null;
+
+  ngOnInit(): void {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      this.currentUser = JSON.parse(storedUser);
+    }
+
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.currentUser = user;
+      }
+    });
+  }
+
+  isAdmin(): boolean {
+    return this.currentUser?.role === 'Admin';
+  }
+
+  isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
+}
