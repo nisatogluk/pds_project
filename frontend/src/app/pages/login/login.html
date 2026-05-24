@@ -13,7 +13,7 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div class="field-group">
           <label>Email</label>
-          <input type="email" formControlName="email" placeholder="student@estgf.ipp.pt">
+          <input type="text" formControlName="email" placeholder="student@estgf.ipp.pt">
           <div class="error-text" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
             <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required.</span>
             <span *ngIf="loginForm.get('email')?.errors?.['email']">Invalid email format.</span>
