@@ -1,5 +1,18 @@
 <div id="map"></div>
 
+<div class="bell-container" (click)="toggleDropdown()" *ngIf="isAuthenticated()">
+  <span class="bell-icon">🔔</span>
+  <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+  <div class="dropdown" *ngIf="showDropdown" (click)="$event.stopPropagation()">
+    <div class="dropdown-header">Notifications</div>
+    <div *ngIf="notifications.length === 0" class="empty">No notifications</div>
+    <div *ngFor="let n of notifications" class="notification-item" [class.unread]="!n.read">
+      <div>{{ n.message }}</div>
+      <div class="notification-date">{{ n.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+    </div>
+  </div>
+</div>
+
 <div class="floating-buttons">
   <button [hidden]="isAdmin()" routerLink="/report">➕ Report</button>
   <button [hidden]="isAdmin()" routerLink="/my-occurrences">📋 My Occurrences</button>
