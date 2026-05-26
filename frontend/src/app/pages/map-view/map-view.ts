@@ -1,25 +1,29 @@
-import { Component, AfterViewInit, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit, inject, HostListener } from '@angular/core';
 import * as L from 'leaflet';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-map-view',
   standalone: true,
-  imports: [CommonModule, RouterLink, HttpClientModule],
+  imports: [CommonModule, RouterLink, HttpClientModule, DatePipe],
   templateUrl: './map-view.html',
   styleUrls: ['./map-view.css']
 })
 export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = true;
   currentUser: any = null;
+  notifications: any[] = [];
+  showDropdown = false;
   private map!: L.Map;
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
 
- private redIcon = L.divIcon({
+  private redIcon = L.divIcon({
     className: '',
     html: `<div style="
       display: flex;
@@ -41,6 +45,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     popupAnchor: [0, -24]
   });
 
+  get unreadCount(): number {
+    return this.notifications.filter(n => !n.read).length;
+  }
+
   ngOnInit(): void {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -49,10 +57,33 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authService.currentUser$.subscribe(user => {
       if (user) this.currentUser = user;
     });
+    if (this.isAuthenticated()) this.loadNotifications();
+  }
+
+  loadNotifications(): void {
+    this.notificationService.getMyNotifications().subscribe({
+      next: (data) => { this.notifications = data.slice(0, 5); },
+      error: (err) => console.error(err)
+    });
+  }
+
+  toggleDropdown(): void {
+    this.showDropdown = !this.showDropdown;
+    if (this.showDropdown) this.loadNotifications();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.bell-container')) this.showDropdown = false;
   }
 
   isAdmin(): boolean {
     return this.currentUser?.role === 'Admin';
+  }
+
+  isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
   }
 
   ngAfterViewInit(): void {
@@ -63,7 +94,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.http.get<any[]>('http://localhost:3001/api/v1/occurrences/map')
       .subscribe({
-        next: (data) => {
+        next: (data: any[]) => {
           this.loading = false;
           console.log("Data to map:", data);
 
@@ -86,7 +117,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
               .bindPopup(popupContent);
           });
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error("Map can not load:", err);
           this.loading = false;
         }
