@@ -32,9 +32,11 @@ export class DataService {
 
   // Get current user's occurrences
   getMyOccurrences(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/my-occurrences`, {
-      headers: this.getHeaders()
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': token ? `Bearer ${token}` : ''
     });
+    return this.http.get<any[]>(`${this.baseUrl}/my-occurrences`, { headers });
   }
 
   // Update an occurrence
