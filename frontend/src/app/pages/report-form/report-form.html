@@ -35,29 +35,31 @@
     <div class="coord-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
       <div style="flex: 1;">
         <label>Latitude</label>
-        <input 
-          type="number" 
-          step="any" 
-          [(ngModel)]="latitude" 
-          name="latitude" 
-          (input)="updateMarkerFromInputs()" 
+        <input
+          type="number"
+          step="any"
+          [(ngModel)]="latitude"
+          name="latitude"
+          (input)="updateMarkerFromInputs()"
           placeholder="e.g. 41.153">
       </div>
       <div style="flex: 1;">
         <label>Longitude</label>
-        <input 
-          type="number" 
-          step="any" 
-          [(ngModel)]="longitude" 
-          name="longitude" 
-          (input)="updateMarkerFromInputs()" 
+        <input
+          type="number"
+          step="any"
+          [(ngModel)]="longitude"
+          name="longitude"
+          (input)="updateMarkerFromInputs()"
           placeholder="e.g. -8.625">
       </div>
     </div>
 
-    <label>Photo URL</label>
-    <input type="text" [(ngModel)]="photoUrl" name="photoUrl" placeholder="https://image-link.com/photo.jpg">
-
+    <label>Photo</label>
+    <input type="file" accept=".jpg,.png" (change)="onFileSelected($event)">
+    <div *ngIf="photoPreview" style="margin-top: 10px;">
+      <img [src]="photoPreview" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ccc;">
+    </div>
     <button type="submit" class="submit-btn">
       🚀 Submit Report
     </button>

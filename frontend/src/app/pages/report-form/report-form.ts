@@ -21,6 +21,8 @@ export class ReportFormComponent implements AfterViewInit {
   latitude: number | null = null;
   longitude: number | null = null;
   photoUrl = '';
+  photoPreview: string | null = null;
+  selectedFile: File | null = null;
 
   toastVisible = false;
   toastMessage = '';
@@ -87,7 +89,25 @@ export class ReportFormComponent implements AfterViewInit {
       }
     }
   }
-
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        this.showToast('Only .jpg and .png files are allowed!', 'error');
+        return;
+      }
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.photoPreview = e.target?.result as string;
+        this.photoUrl = this.photoPreview;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
   submitForm(): void {
     if (!this.title?.trim()) { this.showToast("⚠️ Title is required!", "error"); return; }
     if (!this.category) { this.showToast("⚠️ Please select a category!", "error"); return; }
@@ -96,8 +116,7 @@ export class ReportFormComponent implements AfterViewInit {
       this.showToast("📍 Please select a location!", "error");
       return;
     }
-    if (!this.photoUrl?.trim()) { this.showToast("📸 Photo URL is required!", "error"); return; }
-
+    if (!this.photoUrl?.trim()) { this.showToast('Photo is required!', 'error'); return; }
     const data = {
       title: this.title,
       category: this.category,
