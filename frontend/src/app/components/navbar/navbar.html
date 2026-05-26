@@ -3,18 +3,28 @@
     <a routerLink="/login">Login</a>
     <a routerLink="/register">Register</a>
   </ng-container>
-
   <ng-container *ngIf="isAuthenticated()">
     <a routerLink="/home">Map</a>
     <a routerLink="/report-form">Report</a>
     <a routerLink="/my-occurrences">My Occurrences</a>
     <a routerLink="/profile">My Profile</a>
     <a routerLink="/change-password">Change Password</a>
-
     <ng-container *ngIf="isAdmin()">
       <a routerLink="/admin-dashboard">Admin Dashboard</a>
     </ng-container>
-
     <a routerLink="/login" (click)="logout()">Logout</a>
+
+    <div class="bell-container" (click)="toggleDropdown()">
+      <span class="bell-icon">&#128276;</span>
+      <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      <div class="dropdown" *ngIf="showDropdown" (click)="$event.stopPropagation()">
+        <div class="dropdown-header">Notifications</div>
+        <div *ngIf="notifications.length === 0" class="empty">No notifications</div>
+        <div *ngFor="let n of notifications" class="notification-item" [class.unread]="!n.read">
+          <div>{{ n.message }}</div>
+          <div class="notification-date">{{ n.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+        </div>
+      </div>
+    </div>
   </ng-container>
 </nav>
