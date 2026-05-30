@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data';
+import { OccurrenceService } from '../../services/occurrence.service';
 
 @Component({
   selector: 'app-occurrence-details',
@@ -214,4 +215,30 @@ export class OccurrenceDetailsComponent implements OnInit {
         }
       });
   }
+  private occurrenceService = inject(OccurrenceService);
+
+getUserVote(): string | null {
+    if (!this.occurrence?.votes) return null;
+    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+    if (this.occurrence.votes.upvotes?.some((id: string) => id === userId)) return 'upvote';
+    if (this.occurrence.votes.downvotes?.some((id: string) => id === userId)) return 'downvote';
+    return null;
+}
+
+isOwnOccurrence(): boolean {
+    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+    return String(this.occurrence?.userId) === String(userId);
+}
+
+vote(voteType: string): void {
+    if (!this.isLoggedIn || this.isOwnOccurrence()) return;
+    const id = this.occurrence._id;
+    this.occurrenceService.voteOccurrence(id, voteType).subscribe({
+        next: (data: any) => {
+            this.occurrence = data;
+            this.cdr.detectChanges();
+        },
+        error: (err: any) => console.error('Vote error:', err)
+    });
+}
 }

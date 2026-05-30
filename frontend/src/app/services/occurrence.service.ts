@@ -37,4 +37,8 @@ export class OccurrenceService {
   deleteOccurrence(id: string): Observable<any> {
     return this.http.delete(`${this.occurrenceUrl}/${id}`, { headers: this.getHeaders() });
   }
+
+  voteOccurrence(id: string, voteType: string): Observable<any> {
+    return this.http.post(`${this.occurrenceUrl}/${id}/vote`, { voteType }, { headers: this.getHeaders() });
+  }
 }

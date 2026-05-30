@@ -1,208 +1,83 @@
 <div class="container">
 
-    <!-- LOADING -->
-
     <div *ngIf="loading" class="loader-container">
-
         <div class="loader"></div>
-
         <p>Loading details...</p>
-
     </div>
-
-    <!-- DETAIL CARD -->
 
     <div *ngIf="!loading && occurrence" class="detail-card">
 
-        <!-- IMAGE -->
-
         <div class="image-container">
-
             <img [src]="occurrence.photoUrl || 'assets/no-image.png'" alt="Occurrence image">
-
         </div>
 
-        <!-- CONTENT -->
-
         <div class="content">
-
             <span class="category-badge">
-
                 {{ occurrence.category || 'Incident' }}
-
             </span>
-
-            <h1>
-
-                {{ occurrence.title }}
-
-            </h1>
-
-            <p class="description">
-
-                {{ occurrence.description }}
-
-            </p>
-
-            <!-- LOCATION -->
+            <h1>{{ occurrence.title }}</h1>
+            <p class="description">{{ occurrence.description }}</p>
 
             <div class="info-row">
-
-                <span class="info-label">
-
-                    📍 Location
-
-                </span>
-
-                <span class="info-value">
-
-                    {{ occurrence.location }}
-
-                </span>
-
+                <span class="info-label">📍 Location</span>
+                <span class="info-value">{{ occurrence.location }}</span>
             </div>
-
-            <!-- USER -->
-
             <div class="info-row">
-
-                <span class="info-label">
-
-                    👤 User Reference
-
-                </span>
-
-                <span class="info-value">
-
-                    {{ occurrence.userId }}
-
-                </span>
-
+                <span class="info-label">👤 User Reference</span>
+                <span class="info-value">{{ occurrence.userId }}</span>
             </div>
-
-            <!-- STATUS -->
-
             <div class="info-row">
-
-                <span class="info-label">
-
-                    🚦 Status
-
-                </span>
-
-                <span class="status" [ngClass]="'status-' + occurrence.status">
-
-                    {{ occurrence.status }}
-
-                </span>
-
+                <span class="info-label">🚦 Status</span>
+                <span class="status" [ngClass]="'status-' + occurrence.status">{{ occurrence.status }}</span>
             </div>
-
-            <!-- DATE -->
-
             <div class="info-row">
-
-                <span class="info-label">
-
-                    📅 Date
-
-                </span>
-
-                <span class="info-value">
-
-                    {{ formatDate(occurrence.createdAt) }}
-
-                </span>
-
+                <span class="info-label">📅 Date</span>
+                <span class="info-value">{{ formatDate(occurrence.createdAt) }}</span>
             </div>
+        </div>
 
+        <!-- VOTES -->
+        <div class="votes-section" *ngIf="occurrence">
+        <button
+        class="vote-btn"
+        [class.active]="getUserVote() === 'upvote'"
+        [disabled]="!isLoggedIn || isOwnOccurrence()"
+        (click)="vote('upvote')">
+        ↑ This affects me
+        </button>
+        <span class="vote-count">{{ occurrence.votes?.upvotes?.length || 0 }} people affected</span>
         </div>
 
         <!-- COMMENTS -->
-
         <div class="comments-section">
-
-            <h3>
-
-                💬 Comments
-                ({{ occurrence.comments?.length || 0 }})
-
-            </h3>
-
-            <!-- NO COMMENTS -->
+            <h3>💬 Comments ({{ occurrence.comments?.length || 0 }})</h3>
 
             <div *ngIf="!occurrence.comments?.length" class="no-comments">
-
                 No comments yet.
-
             </div>
-
-            <!-- COMMENT LIST -->
 
             <div class="comment-list">
-
                 <div *ngFor="let comment of occurrence.comments" class="comment-card">
-
-                    <p class="comment-text">
-
-                        {{ comment.text }}
-
-                    </p>
-
+                    <p class="comment-text">{{ comment.text }}</p>
                     <div class="comment-meta">
-
-                        <span>
-
-                            👤 {{ getCommentLabel(comment) }}
-
-                        </span>
-
-                        <span>
-
-                            {{ formatDate(comment.createdAt) }}
-
-                        </span>
-
+                        <span>👤 {{ getCommentLabel(comment) }}</span>
+                        <span>{{ formatDate(comment.createdAt) }}</span>
                     </div>
-
                 </div>
-
             </div>
-
-            <!-- COMMENT FORM -->
 
             <div *ngIf="isLoggedIn" class="comment-form">
-
                 <textarea [(ngModel)]="newComment" placeholder="Write a comment..."></textarea>
-
-                <button (click)="postComment()" [disabled]="!newComment.trim()">
-
-                    Post
-
-                </button>
-
+                <button (click)="postComment()" [disabled]="!newComment.trim()">Post</button>
             </div>
-
-            <!-- LOGIN WARNING -->
 
             <div *ngIf="!isLoggedIn" class="login-warning">
-
                 <b>Login to comment</b>
-
             </div>
-
         </div>
 
-        <!-- FOOTER -->
-
         <div class="footer">
-
-            <a routerLink="/home" class="back-btn">
-
-                ← Return to Map
-
-            </a>
-
+            <a routerLink="/home" class="back-btn">← Return to Map</a>
         </div>
 
     </div>
