@@ -32,5 +32,8 @@ router.delete('/:id', verifyToken, itemRESTController.deleteOccurrence);
 
 // Get all occurrences (admin only)
 router.get('/', verifyToken, isAdmin, itemRESTController.getAllOccurrences);
+
+// Vote on occurrence (requires authentication)
+router.post('/:id/vote', verifyToken, itemRESTController.voteOccurrence);
   
 module.exports = router;

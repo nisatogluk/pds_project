@@ -336,4 +336,50 @@ itemRESTController.deleteComment = async function(req, res) {
     }
 };
 
+// Vote on occurrence
+itemRESTController.voteOccurrence = async function(req, res) {
+    try {
+        const { voteType } = req.body; // 'upvote' or 'downvote'
+        const occurrenceId = req.params.id;
+        const userId = req.user ? (req.user.id || req.user._id) : null;
+
+        if (!userId) return res.status(401).json({ message: "User not authenticated." });
+        if (!['upvote', 'downvote'].includes(voteType)) {
+            return res.status(400).json({ message: "Invalid vote type." });
+        }
+
+        const occurrence = await Occurrence.findById(occurrenceId);
+        if (!occurrence) return res.status(404).json({ message: "Occurrence not found." });
+
+        // Cannot vote on own occurrence
+        if (String(occurrence.userId) === String(userId)) {
+            return res.status(403).json({ message: "You cannot vote on your own occurrence." });
+        }
+
+        // Initialize votes if not exist
+        if (!occurrence.votes) occurrence.votes = { upvotes: [], downvotes: [] };
+
+        const upvotes = occurrence.votes.upvotes.map(String);
+        const downvotes = occurrence.votes.downvotes.map(String);
+        const userIdStr = String(userId);
+
+        // Remove from both arrays first (debounce)
+        occurrence.votes.upvotes = occurrence.votes.upvotes.filter(id => String(id) !== userIdStr);
+        occurrence.votes.downvotes = occurrence.votes.downvotes.filter(id => String(id) !== userIdStr);
+
+        // Add to the correct array (unless already voted same)
+        if (voteType === 'upvote' && !upvotes.includes(userIdStr)) {
+            occurrence.votes.upvotes.push(userId);
+        } else if (voteType === 'downvote' && !downvotes.includes(userIdStr)) {
+            occurrence.votes.downvotes.push(userId);
+        }
+
+        await occurrence.save();
+        res.status(200).json(occurrence);
+    } catch (error) {
+        console.error("Vote error:", error);
+        res.status(500).json({ message: "Error processing vote" });
+    }
+};
+
 module.exports = itemRESTController;

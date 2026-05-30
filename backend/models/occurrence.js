@@ -21,6 +21,9 @@ var OccurrenceSchema = new mongoose.Schema({
     longitude: { type: Number, required: false },
     latitude: { type: Number, required: false },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    votes: {
+    upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]},
     createdAt: { type: Date, default: Date.now },
     comments: [CommentSchema]
 });

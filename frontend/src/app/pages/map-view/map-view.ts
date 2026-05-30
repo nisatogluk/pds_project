@@ -102,15 +102,15 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
             if (!occ.latitude || !occ.longitude) return;
 
             const popupContent = `
-              <div style="min-width:150px; font-family: sans-serif;">
-                <b style="color: #1e1b4b;">${occ.title}</b><br>
-                <span style="padding: 2px 6px; background: #e0e7ff; border-radius: 4px; font-size: 10px;">${occ.status}</span><br>
-                <img src="${occ.photoUrl}" style="width:120px; height:80px; object-fit:cover; border-radius:6px; margin:8px 0;"><br>
-                <a href="/this-occurrence/${occ._id}" style="color:#4338ca; text-decoration:none; font-weight:bold; font-size: 13px;">
-                  View Details →
-                </a>
-              </div>
-            `;
+            <div style="min-width:150px; font-family: sans-serif;">
+            <b style="color: #1e1b4b;">${occ.title}</b><br>
+            <span style="padding: 2px 6px; background: #e0e7ff; border-radius: 4px; font-size: 10px;">${occ.status}</span><br>
+             <img src="${occ.photoUrl}" style="width:120px; height:80px; object-fit:cover; border-radius:6px; margin:8px 0;"><br>
+             <a href="/occurrence/${occ._id}" style="color:#4338ca; text-decoration:none; font-weight:bold; font-size: 13px;">
+              View Details →
+               </a>
+                </div>
+                `;
 
             L.marker([occ.latitude, occ.longitude], { icon: this.redIcon })
               .addTo(this.map)
