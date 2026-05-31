@@ -241,4 +241,49 @@ vote(voteType: string): void {
         error: (err: any) => console.error('Vote error:', err)
     });
 }
+showDeleteOccurrenceModal = false;
+showDeleteCommentModal = false;
+selectedCommentId = '';
+moderationReason = '';
+
+isModerator(): boolean {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user?.role === 'Moderator' || user?.role === 'Admin';
+}
+
+openDeleteOccurrenceModal(): void {
+    this.moderationReason = '';
+    this.showDeleteOccurrenceModal = true;
+}
+
+openDeleteCommentModal(commentId: string): void {
+    this.selectedCommentId = commentId;
+    this.moderationReason = '';
+    this.showDeleteCommentModal = true;
+}
+
+closeModals(): void {
+    this.showDeleteOccurrenceModal = false;
+    this.showDeleteCommentModal = false;
+    this.moderationReason = '';
+}
+
+confirmDeleteOccurrence(): void {
+    if (!this.moderationReason.trim()) return;
+    this.occurrenceService.moderatorDeleteOccurrence(this.occurrence._id, this.moderationReason).subscribe({
+        next: () => window.location.href = '/home',
+        error: (err: any) => console.error('Error:', err)
+    });
+}
+
+confirmDeleteComment(): void {
+    if (!this.moderationReason.trim()) return;
+    this.occurrenceService.moderatorDeleteComment(this.occurrence._id, this.selectedCommentId, this.moderationReason).subscribe({
+        next: () => {
+            this.closeModals();
+            this.loadOccurrenceDetails(this.occurrence._id);
+        },
+        error: (err: any) => console.error('Error:', err)
+    });
+}
 }
