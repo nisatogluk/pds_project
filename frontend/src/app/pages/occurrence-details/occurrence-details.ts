@@ -71,7 +71,7 @@ export class OccurrenceDetailsComponent implements OnInit {
 
         // COMMENT NORMALIZATION to ensure fields always exist
         this.occurrence.comments = this.occurrence.comments.map((c: any) => ({
-
+          _id: c?._id || c?.id, // admin delete comment fix
           text:
             c?.text ||
             c?.body ||
