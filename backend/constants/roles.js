@@ -1,6 +1,7 @@
 const ROLES = {
     CONTRIBUTOR: 'Contributor',
-    ADMIN: 'Admin'
+    ADMIN: 'Admin',
+    MEDIATOR: 'Moderator'
 };
 
 module.exports = ROLES;

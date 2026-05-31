@@ -22,4 +22,12 @@ const isAdmin = (req, res, next) => {
     }
 };
 
-module.exports = { verifyToken, isAdmin };
+const isModerator = (req, res, next) => {
+    if (req.user && (req.user.role === 'Moderator' || req.user.role === 'Admin')) {
+        next();
+    } else {
+        return res.status(403).json({ message: "Requires Moderator or Admin Role." });
+    }
+};
+
+module.exports = { verifyToken, isAdmin, isModerator };

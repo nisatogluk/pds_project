@@ -11,6 +11,7 @@ const authRouter = require('./routes/auth');
 const itemRESTRouter = require('./routes/itemsREST');
 const notificationsRouter = require('./routes/notificationsREST');
 const usersRouter = require('./routes/usersREST');
+const moderationRouter = require('./routes/moderationREST');
 
 // DB Connection
 if (!process.env.MONGODB_URI) {
@@ -44,6 +45,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/occurrences', itemRESTRouter);
 app.use('/api/v1/notifications', notificationsRouter);
 app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/moderation', moderationRouter); // <- aqui!
 
 // 404
 app.use((req, res, next) => next(createError(404)));
@@ -57,5 +59,7 @@ app.use((err, req, res, next) => {
         : err.message;
     res.status(status).json({ message });
 });
+
+app.use('/api/v1/moderation', moderationRouter);
 
 module.exports = app;
