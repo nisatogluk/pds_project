@@ -41,4 +41,18 @@ export class OccurrenceService {
   voteOccurrence(id: string, voteType: string): Observable<any> {
     return this.http.post(`${this.occurrenceUrl}/${id}/vote`, { voteType }, { headers: this.getHeaders() });
   }
+
+  moderatorDeleteOccurrence(id: string, reason: string): Observable<any> {
+    return this.http.delete(`http://localhost:3001/api/v1/moderation/occurrences/${id}`, {
+        headers: this.getHeaders(),
+        body: { reason }
+    });
+  }
+
+  moderatorDeleteComment(occurrenceId: string, commentId: string, reason: string): Observable<any> {
+    return this.http.delete(`http://localhost:3001/api/v1/moderation/occurrences/${occurrenceId}/comments/${commentId}`, {
+        headers: this.getHeaders(),
+        body: { reason }
+    });
+  }
 }

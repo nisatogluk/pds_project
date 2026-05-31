@@ -129,4 +129,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.map.remove();
     }
   }
+
+  isModerator(): boolean {
+    return this.currentUser?.role === 'Moderator';
+  }
 }
