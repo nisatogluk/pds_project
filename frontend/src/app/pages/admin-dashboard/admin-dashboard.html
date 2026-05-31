@@ -5,9 +5,80 @@
         <h1>Admin Dashboard</h1>
         <p>Occurrence Management System</p>
       </div>
+      <button class="btn-charts" (click)="toggleCharts()">
+        {{ showCharts ? '📊 Hide Charts' : '📊 Show Charts' }}
+      </button>
     </div>
   </header>
 
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card total">
+      <span class="kpi-label">Total</span>
+      <span class="kpi-value">{{ totalOccurrences }}</span>
+    </div>
+    <div class="kpi-card pending">
+      <span class="kpi-label">Pending</span>
+      <span class="kpi-value">{{ pendingCount }}</span>
+    </div>
+    <div class="kpi-card approved">
+      <span class="kpi-label">Approved</span>
+      <span class="kpi-value">{{ approvedCount }}</span>
+    </div>
+    <div class="kpi-card resolution">
+      <span class="kpi-label">In Resolution</span>
+      <span class="kpi-value">{{ inResolutionCount }}</span>
+    </div>
+    <div class="kpi-card solved">
+      <span class="kpi-label">Solved</span>
+      <span class="kpi-value">{{ solvedCount }}</span>
+    </div>
+    <div class="kpi-card rejected">
+      <span class="kpi-label">Rejected</span>
+      <span class="kpi-value">{{ rejectedCount }}</span>
+    </div>
+    <div class="kpi-card avg">
+      <span class="kpi-label">Avg Resolution</span>
+      <span class="kpi-value small">{{ avgResolutionTime }}</span>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-section" *ngIf="showCharts">
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Occurrences by Status</h3>
+        <canvas id="statusChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Occurrences by Category</h3>
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>Period</label>
+      <select [(ngModel)]="selectedPeriod" (change)="applyFilters()">
+        <option value="all">All time</option>
+        <option value="week">Last week</option>
+        <option value="month">Last month</option>
+        <option value="year">Last year</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Sort by</label>
+      <select [(ngModel)]="sortBy" (change)="applyFilters()">
+        <option value="date">Date</option>
+        <option value="votes">Votes</option>
+        <option value="status">Status</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- TABLE -->
   <div class="table-wrapper">
     <table class="occurrence-table">
       <thead>
@@ -15,15 +86,17 @@
           <th>ID</th>
           <th>Title</th>
           <th>Category</th>
+          <th>Votes</th>
           <th>Current Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let occurrence of occurrences">
+        <tr *ngFor="let occurrence of filteredOccurrences">
           <td>{{ occurrence._id | slice:0:6 }}</td>
           <td>{{ occurrence.title }}</td>
           <td>{{ occurrence.category }}</td>
+          <td>{{ occurrence.votes?.upvotes?.length || 0 }}</td>
           <td><span class="status-pill" [ngClass]="occurrence.status.toLowerCase()">{{ occurrence.status }}</span></td>
           <td>
             <button class="btn-update" (click)="openStatusModal(occurrence)">Update Status</button>
@@ -34,8 +107,8 @@
   </div>
 </div>
 
-<app-status-update-modal 
-  [isOpen]="isModalOpen" 
+<app-status-update-modal
+  [isOpen]="isModalOpen"
   [currentStatus]="selectedOccurrenceStatus"
   (close)="closeStatusModal()"
   (save)="handleStatusUpdate($event)">

@@ -55,4 +55,10 @@ export class OccurrenceService {
         body: { reason }
     });
   }
+
+
+
+  getModerationStats(): Observable<any> {
+  return this.http.get('http://localhost:3001/api/v1/moderation/stats', { headers: this.getHeaders() });
+  }
 }

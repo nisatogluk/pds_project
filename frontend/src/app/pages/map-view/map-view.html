@@ -24,4 +24,7 @@
   <button [hidden]="!isAdmin()" routerLink="/admin-dashboard" class="menu-button">
     <span class="icon">⚙️</span> Admin Dashboard
   </button>
+  <button [hidden]="!isModerator()" routerLink="/moderator-dashboard" class="menu-button">
+    <span class="icon">🛡️</span> Moderation Panel
+  </button>
 </div>
