@@ -95,4 +95,32 @@ moderationController.deleteComment = async function(req, res) {
     }
 };
 
+// Get moderation stats for current moderator
+moderationController.getStats = async function(req, res) {
+    try {
+        const moderatorId = req.user.id || req.user._id;
+
+        const [deletedOccurrences, deletedComments, totalOccurrences, totalComments] = await Promise.all([
+            ModerationLog.countDocuments({ moderatorId, targetType: 'occurrence' }),
+            ModerationLog.countDocuments({ moderatorId, targetType: 'comment' }),
+            Occurrence.countDocuments(),
+            Occurrence.aggregate([
+                { $project: { commentCount: { $size: { $ifNull: ['$comments', []] } } } },
+                { $group: { _id: null, total: { $sum: '$commentCount' } } }
+            ])
+        ]);
+
+        res.status(200).json({
+            deletedOccurrences,
+            deletedComments,
+            totalOccurrences,
+            totalComments: totalComments[0]?.total || 0
+        });
+
+    } catch (error) {
+        console.error("Moderation stats error:", error);
+        res.status(500).json({ message: "Error fetching moderation stats." });
+    }
+};
+
 module.exports = moderationController;

@@ -9,4 +9,7 @@ router.delete('/occurrences/:id', verifyToken, isModerator, moderationController
 // Delete comment (moderator)
 router.delete('/occurrences/:id/comments/:commentId', verifyToken, isModerator, moderationController.deleteComment);
 
+// Get moderation stats
+router.get('/stats', verifyToken, isModerator, moderationController.getStats);
+
 module.exports = router;

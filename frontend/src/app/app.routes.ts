@@ -12,7 +12,7 @@ import { ResetPasswordPage } from './pages/reset-password/reset-password';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard';
 import { ChangePasswordComponent } from './pages/change-password/change-password';
 import { adminGuard } from './guards/admin.guard';
-
+import { ModeratorDashboard } from './pages/moderator-dashboard/moderator-dashboard';
 
 
 export const routes: Routes = [
@@ -29,5 +29,6 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordPage },
   { path: 'admin-dashboard', component: AdminDashboardComponent},
   { path: 'profile', component: ProfileComponent },
-  { path: 'change-password', component: ChangePasswordComponent }
+  { path: 'change-password', component: ChangePasswordComponent },
+  { path: 'moderator-dashboard', component: ModeratorDashboard }
 ];
