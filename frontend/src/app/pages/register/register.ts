@@ -3,11 +3,14 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import {PasswordStrengthComponent} from '../../components/password-strength/password-strength';
+
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, PasswordStrengthComponent],
+
   templateUrl: './register.html',
   styleUrls: ['../login/login.css']
 })

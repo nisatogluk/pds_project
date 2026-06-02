@@ -58,6 +58,9 @@
               </svg>
             </button>
           </div>
+
+          <app-password-strength [passwordToCheck]="registerForm.get('password')?.value"></app-password-strength>
+
           <div class="error-text" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
             <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required.</span>
             <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters.</span>
