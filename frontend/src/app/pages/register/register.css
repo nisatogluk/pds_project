@@ -1,50 +1,183 @@
-.register-container {
+/* Same theme as Login.css — auth-container, split layout, button, colors preserved */
+.auth-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.auth-split-left {
+  flex: 1;
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1949&auto=format&fit=crop') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  align-items: flex-end;
+  padding: 60px;
+}
+
+.overlay-content {
+  color: white;
+  font-family: sans-serif;
+}
+.overlay-content h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+/* added scroll  */
+.auth-split-right {
+  flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f0f2f5;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
+  align-items: flex-start;       
+  padding: 40px;
+  background-color: white;
+  overflow-y: auto;              /* scroll works if the form is long */
+  max-height: 100vh;
 }
 
-.register-box {
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.form-container {
   width: 100%;
   max-width: 400px;
-  text-align: center;
+  padding: 20px 0;               
+}
+.form-container h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 30px;
 }
 
-h2 { color: #1a1a1a; margin-bottom: 8px; }
-p { color: #65676b; margin-bottom: 24px; font-size: 14px; }
-
-.input-group { text-align: left; margin-bottom: 15px; }
-label { display: block; margin-bottom: 5px; font-weight: 600; color: #4b4b4b; font-size: 14px; }
-
-input {
+.field-group {
+  margin-bottom: 20px;
+}
+.field-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.field-group input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #dddfe2;
-  border-radius: 6px;
+  padding: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #fafafa;
   box-sizing: border-box;
+  font-size: 14px;
 }
 
-.register-button {
+/* checkbox should not be crushed by global input style in login.css */
+input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  accent-color: #4db8ff;
+}
+
+/*  phone input */
+input[type="tel"] {
   width: 100%;
-  padding: 12px;
-  background-color: #00b894; /* Um verde esperança para diferenciar do login */
+  padding: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #fafafa;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.error-text {
+  color: #e60023;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+
+fieldset {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+legend {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b4b4b;
+  padding: 0 6px;
+}
+
+fieldset .field-group {
+  margin-bottom: 12px;
+}
+
+/*  postal code + city side to side*/
+.field-inline {
+  display: flex;
+  gap: 10px;
+}
+
+.field-inline .field-group {
+  flex: 1;
+}
+
+/*  GDPR checkbox  */
+.gdpr-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.gdpr-group label {
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 16px;
+  background-color: #4db8ff;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+  border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
-.register-button:hover { background-color: #00a383; }
-.footer-links { margin-top: 16px; font-size: 13px; color: #65676b; }
-.footer-links a { color: #0084ff; text-decoration: none; font-weight: 600; }
+.auth-btn:hover {
+  background-color: #1aa3ff;
+}
+
+.auth-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+
+.switch-auth {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.switch-auth a {
+  color: #4db8ff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+
+.server-error {
+  color: #e60023;
+  background-color: #ffe6e6;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}

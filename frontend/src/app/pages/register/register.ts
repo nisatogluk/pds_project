@@ -9,12 +9,12 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './register.html',
-  styleUrls: ['../login/login.css']
+  styleUrls: ['../register/register.css']
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   errorMessage: string = '';
-  
+
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -24,17 +24,35 @@ export class RegisterComponent implements OnInit {
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required]
+      confirmPassword: ['', Validators.required],
+      phoneNumber: ['', [Validators.pattern(/^(\+351\s?)?[923]\d{8}$|^$/)]],
+      addressLine1: [''],
+      addressLine2: [''],
+      postalCode: ['', [Validators.pattern(/^\d{4}-\d{3}$|^$/)]],
+      city: [''],
+      gdprConsent: [false, Validators.requiredTrue]
     });
   }
 
   onSubmit(): void {
     if (this.registerForm.valid) {
+      const {
+        username, email, password, confirmPassword,
+        phoneNumber, addressLine1, addressLine2, postalCode, city
+      } = this.registerForm.value;
+
       const formData = {
-        name: this.registerForm.value.username,
-        email: this.registerForm.value.email,
-        password: this.registerForm.value.password,
-        confirmPassword: this.registerForm.value.confirmPassword
+
+        name: username,
+        email,
+        password,
+        confirmPassword,
+        phoneNumber: phoneNumber || null,
+
+        address: [addressLine1, addressLine2, postalCode, city]
+          .filter(Boolean)
+          .join(', ') || null,
+
       };
 
       this.authService.register(formData).subscribe({
