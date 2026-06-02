@@ -5,8 +5,18 @@ import { CommonModule } from '@angular/common';
   selector: 'app-password-strength',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './password-strength.component.html',
-  styleUrls: ['./password-strength.component.css']
+  template: `
+    <div class="strength-container" *ngIf="passwordToCheck">
+      <div class="bars-wrapper">
+        <div class="strength-bar" [style.background-color]="bar0"></div>
+        <div class="strength-bar" [style.background-color]="bar1"></div>
+        <div class="strength-bar" [style.background-color]="bar2"></div>
+      </div>
+      <span class="strength-label" [style.color]="bar0 !== '#e0e0e0' ? bar0 : '#999'">
+        {{ strengthText }}
+      </span>
+    </div>
+  `
 })
 export class PasswordStrengthComponent implements OnChanges {
   // Recebe a password do formulário pai (ex: Registo)
