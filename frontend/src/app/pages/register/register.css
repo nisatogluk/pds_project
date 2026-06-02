@@ -30,7 +30,7 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: flex-start;       
+  align-items: flex-start;
   padding: 40px;
   background-color: white;
   overflow-y: auto;              /* scroll works if the form is long */
@@ -40,7 +40,7 @@
 .form-container {
   width: 100%;
   max-width: 400px;
-  padding: 20px 0;               
+  padding: 20px 0;
 }
 .form-container h1 {
   font-size: 28px;
@@ -74,7 +74,7 @@ input[type="checkbox"] {
   accent-color: #4db8ff;
 }
 
-/*  phone input */
+/* phone input */
 input[type="tel"] {
   width: 100%;
   padding: 14px;
@@ -110,7 +110,7 @@ fieldset .field-group {
   margin-bottom: 12px;
 }
 
-/*  postal code + city side to side*/
+/* postal code + city side to side*/
 .field-inline {
   display: flex;
   gap: 10px;
@@ -120,7 +120,7 @@ fieldset .field-group {
   flex: 1;
 }
 
-/*  GDPR checkbox  */
+/* GDPR checkbox  */
 .gdpr-group {
   display: flex;
   align-items: flex-start;
@@ -180,4 +180,29 @@ fieldset .field-group {
   margin-bottom: 20px;
   font-size: 14px;
   font-weight: 600;
+}
+
+/* ==========================================================================
+   INTEGRAÇÃO DAS USER STORIES: BOTÃO DO OLHO & BARRAS DE FORÇA
+   ========================================================================== */
+
+/* Garante que o texto longo da password não passa por baixo do olho */
+.field-group input[formControlName="password"] {
+  padding-right: 45px !important;
+}
+
+/* Transições e cores dinâmicas para o medidor de força */
+.bar.red {
+  background-color: #e60023 !important; /* Vermelho que já usas nas mensagens */
+  transition: background-color 0.3s ease;
+}
+
+.bar.yellow {
+  background-color: #f59e0b !important; /* Amarelo / Âmbar */
+  transition: background-color 0.3s ease;
+}
+
+.bar.green {
+  background-color: #10b981 !important; /* Verde Sucesso */
+  transition: background-color 0.3s ease;
 }

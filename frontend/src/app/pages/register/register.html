@@ -34,7 +34,28 @@
 
         <div class="field-group">
           <label>Password</label>
-          <input type="password" formControlName="password" placeholder="Create a password">
+          <div style="position: relative; display: flex; align-items: center;">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Create a password"
+              (input)="onPasswordInput()"
+              style="padding-right: 40px; width: 100%;">
+
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0; margin: 0; line-height: 1;">
+              {{ showPassword ? '👁️' : '🙈' }}
+            </button>
+          </div>
+
+          <div class="strength-meter" style="display: flex; gap: 5px; margin-top: 8px;">
+            <div class="bar" [class.red]="strength > 0" style="flex: 1; height: 6px; background: #e0e0e0; border-radius: 3px;"></div>
+            <div class="bar" [class.yellow]="strength > 1" style="flex: 1; height: 6px; background: #e0e0e0; border-radius: 3px;"></div>
+            <div class="bar" [class.green]="strength > 2" style="flex: 1; height: 6px; background: #e0e0e0; border-radius: 3px;"></div>
+          </div>
+
           <div class="error-text" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
             <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required.</span>
             <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters.</span>
