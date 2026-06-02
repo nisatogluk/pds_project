@@ -66,7 +66,7 @@
                 <div *ngFor="let comment of occurrence.comments" class="comment-card">
                     <p class="comment-text">{{ comment.text }}</p>
                     <div class="comment-meta">
-                        <span>👤 {{ getCommentLabel(comment) }}</span>
+                        <span>👤 {{ getCommentLabel(comment) }}-</span>
                         <span>{{ formatDate(comment.createdAt) }}</span>
                     </div>
                     <button *ngIf="isModerator()" class="mod-delete-btn small" (click)="openDeleteCommentModal(comment._id)">
@@ -86,7 +86,7 @@
         </div>
 
         <div class="footer">
-            <a routerLink="/home" class="back-btn">← Return to Map</a>
+            <a routerLink="/home" class="back-btn">🗺️ Go to Map</a>
         </div>
 
     </div>

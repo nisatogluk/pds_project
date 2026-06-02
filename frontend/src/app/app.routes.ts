@@ -23,7 +23,6 @@ export const routes: Routes = [
   { path: 'my-occurrences', component: MyOccurrencesComponent },
   { path: 'occurrence/:id', component: OccurrenceDetailsComponent },
   { path: 'report-form', component: ReportFormComponent },
-  { path: 'report', component: ReportFormComponent },
   { path: 'account-confirmation', component: AccountConfirmationComponent },
   { path: 'forgot-password', component: ForgotPasswordPage },
   { path: 'reset-password', component: ResetPasswordPage },
