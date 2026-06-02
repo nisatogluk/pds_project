@@ -17,6 +17,8 @@ export class LoginComponent implements OnInit {
   errorMessage: string = '';
   isLoading: boolean = false;
 
+  isPasswordVisible: boolean = false;
+
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -26,6 +28,10 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.isPasswordVisible = !this.isPasswordVisible;
   }
 
   onSubmit(): void {

@@ -1,68 +1,87 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { RouterLink, Router } from '@angular/router';
+import { DataService } from '../../services/data'; // Confirma se o caminho para o teu serviço está correto
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
-  styleUrls: ['../register/register.css']
+  styleUrls: ['./register.css']
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
-  errorMessage: string = '';
+  errorMessage: string | null = null;
 
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private authService = inject(AuthService);
+  // Variáveis para o controlo do Olho e da Força da Password
+  showPassword = false;
+  strength = 0;
+
+  constructor(
+    private fb: FormBuilder,
+    private dataService: DataService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required],
-      phoneNumber: ['', [Validators.pattern(/^(\+351\s?)?[923]\d{8}$|^$/)]],
-      addressLine1: [''],
-      addressLine2: [''],
-      postalCode: ['', [Validators.pattern(/^\d{4}-\d{3}$|^$/)]],
-      city: [''],
-      gdprConsent: [false, Validators.requiredTrue]
-    });
+      confirmPassword: ['', Validators.required]
+    }, { validator: this.passwordMatchValidator });
+  }
+
+  // Validador para garantir que as duas passwords coincidem
+  passwordMatchValidator(g: FormGroup) {
+    return g.get('password')?.value === g.get('confirmPassword')?.value
+      ? null : { 'mismatch': true };
+  }
+
+  // Alterna a visibilidade do texto da password
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  // Calcula dinamicamente o nível de segurança da password
+  onPasswordInput(): void {
+    const password = this.registerForm.get('password')?.value || '';
+    this.strength = 0;
+
+    if (password.length >= 8) {
+      this.strength = 1; // Nível 1: Mínimo de 8 caracteres (Vermelho)
+
+      const hasLetters = /[a-zA-Z]/.test(password);
+      const hasNumbers = /[0-9]/.test(password);
+      const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+
+      // Nível 2: Letras + Números (Amarelo)
+      if (hasLetters && hasNumbers) {
+        this.strength = 2;
+      }
+
+      // Nível 3: Letras + Números + Símbolos Especiais (Verde)
+      if (hasLetters && hasNumbers && hasSpecial) {
+        this.strength = 3;
+      }
+    }
+    this.cdr.detectChanges();
   }
 
   onSubmit(): void {
-    if (this.registerForm.valid) {
-      const {
-        username, email, password, confirmPassword,
-        phoneNumber, addressLine1, addressLine2, postalCode, city
-      } = this.registerForm.value;
+    if (this.registerForm.invalid) return;
 
-      const formData = {
-
-        name: username,
-        email,
-        password,
-        confirmPassword,
-        phoneNumber: phoneNumber || null,
-
-        address: [addressLine1, addressLine2, postalCode, city]
-          .filter(Boolean)
-          .join(', ') || null,
-
-      };
-
-      this.authService.register(formData).subscribe({
-        next: (response) => {
-          this.router.navigate(['/account-confirmation']);
-        },
-        error: (err) => {
-          this.errorMessage = err.error?.message || 'Registration failed.';
-        }
-      });
-    }
+    this.dataService.register(this.registerForm.value).subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (err: any) => {
+        this.errorMessage = err?.error?.message || 'An error occurred during registration.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
