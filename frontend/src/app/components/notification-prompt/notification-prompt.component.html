@@ -1,0 +1,13 @@
+<div *ngIf="showPrompt" class="notification-banner">
+  <div class="banner-content">
+    <span class="bell-icon">📣</span>
+    <div class="text-block">
+      <h4>Enable Notifications</h4>
+      <p>Allow notifications to get instant updates about city occurrences directly on your device.</p>
+    </div>
+  </div>
+  <div class="banner-buttons">
+    <button class="btn-later" (click)="dismissPrompt()">Later</button>
+    <button class="btn-allow" (click)="requestPermission()">Allow</button>
+  </div>
+</div>
