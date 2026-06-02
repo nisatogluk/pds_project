@@ -1,45 +1,44 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
-import { DataService } from '../../services/data'; // Voltamos ao DataService estável
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './register.html',
-  styleUrls: ['./register.css']
+  styleUrls: ['../register/register.css']
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
-  errorMessage: string | null = null;
-  showPassword = false;
+  errorMessage: string = '';
+  isPasswordVisible = false;
   strength = 0;
 
-  constructor(
-    private fb: FormBuilder,
-    private dataService: DataService, // Injeção corrigida
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required]
-    }, { validator: this.passwordMatchValidator });
-  }
-
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value
-      ? null : { 'mismatch': true };
+      confirmPassword: ['', Validators.required],
+      phoneNumber: ['', [Validators.pattern(/^(\+351\s?)?[923]\d{8}$|^$/)]],
+      addressLine1: [''],
+      addressLine2: [''],
+      postalCode: ['', [Validators.pattern(/^\d{4}-\d{3}$|^$/)]],
+      city: [''],
+      gdprConsent: [false, Validators.requiredTrue]
+    });
   }
 
   togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
+    this.isPasswordVisible = !this.isPasswordVisible;
   }
 
   onPasswordInput(): void {
@@ -48,38 +47,42 @@ export class RegisterComponent implements OnInit {
 
     if (password.length >= 8) {
       this.strength = 1;
-
       const hasLetters = /[a-zA-Z]/.test(password);
       const hasNumbers = /[0-9]/.test(password);
       const hasSpecial = /[^a-zA-Z0-9]/.test(password);
-
-      if (hasLetters && hasNumbers) {
-        this.strength = 2;
-      }
-      if (hasLetters && hasNumbers && hasSpecial) {
-        this.strength = 3;
-      }
+      if (hasLetters && hasNumbers) this.strength = 2;
+      if (hasLetters && hasNumbers && hasSpecial) this.strength = 3;
     }
     this.cdr.detectChanges();
   }
 
   onSubmit(): void {
-    if (this.registerForm.invalid) return;
+    if (this.registerForm.valid) {
+      const {
+        username, email, password, confirmPassword,
+        phoneNumber, addressLine1, addressLine2, postalCode, city
+      } = this.registerForm.value;
 
-    // Tentamos usar uma chamada genérica para não quebrar a compilação
-    const anyService = this.dataService as any;
-    const registerMethod = anyService.register || anyService.signUp || anyService.createUser;
+      const formData = {
+        name: username,
+        email,
+        password,
+        confirmPassword,
+        phoneNumber: phoneNumber || null,
+        address: [addressLine1, addressLine2, postalCode, city]
+          .filter(Boolean)
+          .join(', ') || null,
+      };
 
-    if (registerMethod) {
-      registerMethod.call(this.dataService, this.registerForm.value).subscribe({
-        next: () => this.router.navigate(['/login']),
-        error: (err: any) => {
-          this.errorMessage = err?.error?.message || 'An error occurred during registration.';
+      this.authService.register(formData).subscribe({
+        next: () => {
+          this.router.navigate(['/account-confirmation']);
+        },
+        error: (err) => {
+          this.errorMessage = err.error?.message || 'Registration failed.';
           this.cdr.detectChanges();
         }
       });
-    } else {
-      console.error('Método de registo não encontrado no DataService.');
     }
   }
 }
