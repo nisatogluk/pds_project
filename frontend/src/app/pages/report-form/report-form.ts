@@ -2,7 +2,7 @@ import { Component, AfterViewInit, NgZone, ChangeDetectorRef } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http'; // Adicionado HttpClient
 import * as L from 'leaflet';
 import { DataService } from '../../services/data';
 
@@ -28,6 +28,10 @@ export class ReportFormComponent implements AfterViewInit {
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
 
+  // ORS Sugestões & Debounce
+  suggestions: any[] = [];
+  private searchTimeout: any;
+
   private map!: L.Map;
   private marker: L.Marker | null = null;
 
@@ -42,7 +46,8 @@ export class ReportFormComponent implements AfterViewInit {
     private dataService: DataService,
     private zone: NgZone,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private http: HttpClient // Injetado para falar com o nosso Proxy do Backend
   ) { }
 
   ngAfterViewInit(): void {
@@ -62,6 +67,9 @@ export class ReportFormComponent implements AfterViewInit {
         this.latitude = Number(lat.toFixed(6));
         this.longitude = Number(lng.toFixed(6));
         this.updateMarkerOnMap(lat, lng);
+
+        // Faz reverse geocoding automático ao clicar no mapa!
+        this.reverseGeocode(lat, lng);
       });
     });
   }
@@ -89,6 +97,85 @@ export class ReportFormComponent implements AfterViewInit {
       }
     }
   }
+
+  // ---- OPENROUTESERVICE: Autocomplete (Debounce 300ms) ----
+  onSearchInput(event: any): void {
+    const text = event.target.value;
+    this.location = text;
+
+    // Limpa o temporizador se o utilizador continuar a escrever (Debounce)
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
+    // Só pesquisa se tiver pelo menos 3 letras
+    if (text.length < 3) {
+      this.suggestions = [];
+      return;
+    }
+
+    this.searchTimeout = setTimeout(() => {
+      // Chama a nossa rota segura no Backend
+      this.http.get<any>(`http://localhost:3000/api/map/geocode?text=${encodeURIComponent(text)}`).subscribe({
+        next: (data) => {
+          this.suggestions = data.features || [];
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Geocode error:', err)
+      });
+    }, 300);
+  }
+
+  // Selecionar sugestão da lista
+  selectSuggestion(suggestion: any): void {
+    this.location = suggestion.properties.label;
+
+    // ORS devolve coordenadas no formato [longitude, latitude]
+    const [lng, lat] = suggestion.geometry.coordinates;
+    this.latitude = Number(lat.toFixed(6));
+    this.longitude = Number(lng.toFixed(6));
+    this.suggestions = []; // Esconde a lista
+
+    this.map.setView([lat, lng], 16);
+    this.updateMarkerOnMap(lat, lng);
+  }
+
+  // ---- OPENROUTESERVICE: Reverse Geocoding ----
+  private reverseGeocode(lat: number, lng: number): void {
+    this.http.get<any>(`http://localhost:3000/api/map/reverse?lat=${lat}&lon=${lng}`).subscribe({
+      next: (data) => {
+        if (data.features && data.features.length > 0) {
+          this.location = data.features[0].properties.label;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => console.error('Reverse Geocode error:', err)
+    });
+  }
+
+  // Botão: GPS Use My Location
+  useMyLocation(): void {
+    if (!navigator.geolocation) {
+      this.showToast("GPS is not supported by your browser", "error");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        this.latitude = Number(lat.toFixed(6));
+        this.longitude = Number(lng.toFixed(6));
+        this.map.setView([lat, lng], 16);
+        this.updateMarkerOnMap(lat, lng);
+
+        this.reverseGeocode(lat, lng);
+      },
+      (error) => {
+        this.showToast("Unable to retrieve your location", "error");
+      }
+    );
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -108,6 +195,7 @@ export class ReportFormComponent implements AfterViewInit {
       reader.readAsDataURL(file);
     }
   }
+
   submitForm(): void {
     if (!this.title?.trim()) { this.showToast("⚠️ Title is required!", "error"); return; }
     if (!this.category) { this.showToast("⚠️ Please select a category!", "error"); return; }
