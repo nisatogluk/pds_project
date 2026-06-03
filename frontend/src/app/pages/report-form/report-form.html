@@ -28,20 +28,13 @@
 
     <div style="position: relative; margin: 10px 0;">
       <label>Location Name</label>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <input
-          type="text"
-          [(ngModel)]="location"
-          name="location"
-          (input)="onSearchInput($event)"
-          placeholder="e.g. Central Park North"
-          style="margin: 0; flex: 1;"
-          autocomplete="off">
-
-        <button type="button" (click)="useMyLocation()" style="margin: 0; width: auto; padding: 10px; background: #0ea5e9;">
-          📍 GPS
-        </button>
-      </div>
+      <input
+        type="text"
+        [(ngModel)]="location"
+        name="location"
+        (input)="onSearchInput($event)"
+        placeholder="e.g. Central Park North"
+        autocomplete="off">
 
       <ul *ngIf="suggestions && suggestions.length > 0"
           style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-radius: 6px; list-style: none; padding: 0; margin: 4px 0 0 0; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
