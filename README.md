@@ -27,17 +27,17 @@ User profile management, password updates, and toggleable password visibility se
 Frontend: Angular, TypeScript, HTML, CSS, Leaflet
 Backend: .NET Web API (C#), RESTful architecture, JWT Authentication
 Tools & DevOps: Git, GitLab, feature branches
+
 🚀 Getting Started
 1. Backend Setup
-bash
+:
 cd backend
 
 2. Frontend Setup
-bash
+:
 cd frontend
 npm install
 ng serve
-
 
 
 👥 Contributors
