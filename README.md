@@ -25,7 +25,9 @@ User profile management, password updates, and toggleable password visibility se
 
 🛠️ Tech Stack
 Frontend: Angular, TypeScript, HTML, CSS, Leaflet
+
 Backend: .NET Web API (C#), RESTful architecture, JWT Authentication
+
 Tools & DevOps: Git, GitLab, feature branches
 
 🚀 Getting Started
