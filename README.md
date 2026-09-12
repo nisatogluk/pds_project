@@ -22,6 +22,7 @@ User Settings & Security
 
 JWT-backed authentication.
 User profile management, password updates, and toggleable password visibility settings.
+
 🛠️ Tech Stack
 Frontend: Angular, TypeScript, HTML, CSS, Leaflet
 Backend: .NET Web API (C#), RESTful architecture, JWT Authentication
